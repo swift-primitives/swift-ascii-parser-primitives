@@ -92,6 +92,20 @@ let package = Package(
                 .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
             ]
         ),
+        .testTarget(
+            name: "Parseable Integer Primitives Tests",
+            dependencies: [
+                "Parseable Integer Primitives",
+                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+            ]
+        ),
+        .testTarget(
+            name: "Declarative Parser Syntax Tests",
+            dependencies: [
+                "ASCII Decimal Parser Primitives",
+                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+            ]
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
