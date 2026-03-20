@@ -33,6 +33,10 @@ let package = Package(
             name: "ASCII Parser Primitives",
             targets: ["ASCII Parser Primitives"]
         ),
+        .library(
+            name: "ASCII Parser Primitives Test Support",
+            targets: ["ASCII Parser Primitives Test Support"]
+        ),
     ],
     dependencies: [
         .package(path: "../swift-ascii-primitives"),
@@ -105,6 +109,16 @@ let package = Package(
                 "ASCII Decimal Parser Primitives",
                 .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
             ]
+        ),
+
+        // MARK: - Test Support
+        .target(
+            name: "ASCII Parser Primitives Test Support",
+            dependencies: [
+                "ASCII Parser Primitives",
+                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+            ],
+            path: "Tests/Support"
         ),
     ],
     swiftLanguageModes: [.v6]
