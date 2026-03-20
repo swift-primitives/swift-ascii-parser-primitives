@@ -108,7 +108,7 @@ extension Measurement.Range {
 // `.error.map` flattens the left-nested Either tree.
 
 extension Network.Endpoint {
-    struct Parser<Input: Collection.Slice.`Protocol` & Parser_Primitives.Parser.Streaming>: Sendable
+    struct Parser<Input: Collection.Slice.`Protocol` & Parser_Primitives.Parser.Input.Streaming>: Sendable
     where Input: Sendable, Input.Element == UInt8 {
         init() {}
     }
@@ -149,7 +149,7 @@ extension Network.Endpoint.Parser: Parser_Primitives.Parser.`Protocol` {
 // Five parsers → left-nested Either tree of depth 4.
 
 extension Geometry.Point {
-    struct Parser<Input: Collection.Slice.`Protocol` & Parser_Primitives.Parser.Streaming>: Sendable
+    struct Parser<Input: Collection.Slice.`Protocol` & Parser_Primitives.Parser.Input.Streaming>: Sendable
     where Input: Sendable, Input.Element == UInt8 {
         init() {}
     }
@@ -192,7 +192,7 @@ extension Geometry.Point.Parser: Parser_Primitives.Parser.`Protocol` {
 // Same structure as Endpoint but with different delimiter and UInt32.
 
 extension Measurement.Range {
-    struct Parser<Input: Collection.Slice.`Protocol` & Parser_Primitives.Parser.Streaming>: Sendable
+    struct Parser<Input: Collection.Slice.`Protocol` & Parser_Primitives.Parser.Input.Streaming>: Sendable
     where Input: Sendable, Input.Element == UInt8 {
         init() {}
     }
@@ -245,7 +245,7 @@ extension Weighted.Endpoint {
 }
 
 extension Weighted.Endpoint {
-    struct Parser<Input: Collection.Slice.`Protocol` & Parser_Primitives.Parser.Streaming>: Sendable
+    struct Parser<Input: Collection.Slice.`Protocol` & Parser_Primitives.Parser.Input.Streaming>: Sendable
     where Input: Sendable, Input.Element == UInt8 {
         init() {}
     }
