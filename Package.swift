@@ -43,20 +43,28 @@ let package = Package(
         .package(path: "../swift-parser-primitives"),
     ],
     targets: [
-        // MARK: - Subject Domains
+        // MARK: - Core
 
         .target(
-            name: "ASCII Decimal Parser Primitives",
+            name: "ASCII Parser Primitives Core",
             dependencies: [
                 .product(name: "Parser Primitives Core", package: "swift-parser-primitives"),
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
             ]
         ),
+
+        // MARK: - Subject Domains
+
+        .target(
+            name: "ASCII Decimal Parser Primitives",
+            dependencies: [
+                "ASCII Parser Primitives Core",
+            ]
+        ),
         .target(
             name: "ASCII Hexadecimal Parser Primitives",
             dependencies: [
-                .product(name: "Parser Primitives Core", package: "swift-parser-primitives"),
-                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
+                "ASCII Parser Primitives Core",
             ]
         ),
 
