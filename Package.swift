@@ -18,6 +18,10 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "ASCII Parser Primitives Core",
+            targets: ["ASCII Parser Primitives Core"]
+        ),
+        .library(
             name: "ASCII Decimal Parser Primitives",
             targets: ["ASCII Decimal Parser Primitives"]
         ),
