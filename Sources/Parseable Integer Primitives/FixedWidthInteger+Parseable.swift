@@ -5,6 +5,8 @@
 //  Parseable conformances for standard library integer types.
 //
 
+public import Array_Dynamic_Primitives
+
 extension Int: @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, Int> { .init() }
 }
