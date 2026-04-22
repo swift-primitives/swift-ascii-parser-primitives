@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Build + test matrix — see swift-institute/.github/.github/workflows/swift-ci.yml
+  ci:
+    uses: swift-institute/.github/.github/workflows/swift-ci.yml@v1
+    with:
+      cache-key-prefix: swift63-spm-v1
+      enable-private-repos: true
+    secrets:
+      PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+
+  # DocC umbrella-catalog pipeline per [DOC-019a] — see
+  # swift-institute/.github/.github/workflows/swift-docs.yml
+  docs:
+    uses: swift-institute/.github/.github/workflows/swift-docs.yml@v1
+    with:
+      umbrella-module: ASCII_Parser_Primitives
+      umbrella-display-name: "ASCII Parser Primitives"
+      umbrella-bundle-id: "swift-ascii-parser-primitives.ASCII-Parser-Primitives"
+      umbrella-docc-path: "Sources/ASCII Parser Primitives/ASCII Parser Primitives.docc"
+      exclude-modules: "ASCII_Parser_Primitives_Test_Support"
+      enable-private-repos: true
+    secrets:
+      PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
