@@ -27,11 +27,6 @@ jobs:
   docs:
     uses: swift-institute/.github/.github/workflows/swift-docs.yml@main
     with:
-      umbrella-module: ASCII_Parser_Primitives
-      umbrella-display-name: "ASCII Parser Primitives"
-      umbrella-bundle-id: "swift-ascii-parser-primitives.ASCII-Parser-Primitives"
-      umbrella-docc-path: "Sources/ASCII Parser Primitives/ASCII Parser Primitives.docc"
-      exclude-modules: "ASCII_Parser_Primitives_Test_Support"
       enable-private-repos: true
     secrets:
       PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
