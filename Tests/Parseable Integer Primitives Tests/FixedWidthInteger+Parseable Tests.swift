@@ -1,5 +1,5 @@
-import Testing
 import Parseable_Integer_Primitives
+import Testing
 
 @Suite("Parseable Integer Conformances")
 struct ParseableIntegerTests {

@@ -21,9 +21,9 @@
 //  Without it, `":" as Parser.Literal<Input>` is needed.
 //
 
-import Testing
 import ASCII_Decimal_Parser_Primitives
 import Parser_Primitives_Test_Support
+import Testing
 
 // MARK: - Test Suite
 
@@ -127,8 +127,8 @@ extension Network.Endpoint.Parser: Parser_Primitives.Parser.`Protocol` {
         .map { host, port in Network.Endpoint(host: host, port: port) }
         .error.map { (either) -> Network.Endpoint.Error in
             switch either {
-            case .right:        .invalidPort
-            case .left(.left):  .invalidHost
+            case .right: .invalidPort
+            case .left(.left): .invalidHost
             case .left(.right): .expectedColon
             }
         }
@@ -211,8 +211,8 @@ extension Measurement.Range.Parser: Parser_Primitives.Parser.`Protocol` {
         .map { lower, upper in Measurement.Range(lower: lower, upper: upper) }
         .error.map { (either) -> Measurement.Range.Error in
             switch either {
-            case .right:        .invalidUpper
-            case .left(.left):  .invalidLower
+            case .right: .invalidUpper
+            case .left(.left): .invalidLower
             case .left(.right): .expectedDash
             }
         }
@@ -264,8 +264,8 @@ extension Weighted.Endpoint.Parser: Parser_Primitives.Parser.`Protocol` {
         .map { endpoint, weight in Weighted.Endpoint(endpoint: endpoint, weight: weight) }
         .error.map { (either) -> Weighted.Endpoint.Error in
             switch either {
-            case .right:        .invalidWeight
-            case .left(.left):  .invalidEndpoint
+            case .right: .invalidWeight
+            case .left(.left): .invalidEndpoint
             case .left(.right): .expectedSlash
             }
         }
@@ -473,10 +473,13 @@ extension DeclarativeParserSyntaxTests.CompositionTests {
 
         let weighted = try parser.parse(&input)
 
-        #expect(weighted == Weighted.Endpoint(
-            endpoint: Network.Endpoint(host: 80, port: 443),
-            weight: 10
-        ))
+        #expect(
+            weighted
+                == Weighted.Endpoint(
+                    endpoint: Network.Endpoint(host: 80, port: 443),
+                    weight: 10
+                )
+        )
         #expect(input.isEmpty)
     }
 
