@@ -1,4 +1,4 @@
-import Parseable_Integer_Primitives
+import ASCII_Parser_Primitives_Standard_Library_Integration
 import Testing
 
 @Suite("Parseable Integer Conformances")

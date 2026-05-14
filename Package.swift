@@ -30,8 +30,8 @@ let package = Package(
             targets: ["ASCII Hexadecimal Parser Primitives"]
         ),
         .library(
-            name: "Parseable Integer Primitives",
-            targets: ["Parseable Integer Primitives"]
+            name: "ASCII Parser Primitives Standard Library Integration",
+            targets: ["ASCII Parser Primitives Standard Library Integration"]
         ),
         .library(
             name: "ASCII Parser Primitives",
@@ -75,7 +75,7 @@ let package = Package(
         // MARK: - Conformances
 
         .target(
-            name: "Parseable Integer Primitives",
+            name: "ASCII Parser Primitives Standard Library Integration",
             dependencies: [
                 "ASCII Decimal Parser Primitives",
             ]
@@ -88,7 +88,7 @@ let package = Package(
             dependencies: [
                 "ASCII Decimal Parser Primitives",
                 "ASCII Hexadecimal Parser Primitives",
-                "Parseable Integer Primitives",
+                "ASCII Parser Primitives Standard Library Integration",
             ]
         ),
 
@@ -109,9 +109,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "Parseable Integer Primitives Tests",
+            name: "ASCII Parser Primitives Standard Library Integration Tests",
             dependencies: [
-                "Parseable Integer Primitives",
+                "ASCII Parser Primitives Standard Library Integration",
                 .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
             ]
         ),
