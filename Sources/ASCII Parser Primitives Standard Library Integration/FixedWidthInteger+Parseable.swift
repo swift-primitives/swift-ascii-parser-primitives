@@ -2,47 +2,48 @@
 //  FixedWidthInteger+Parseable.swift
 //  swift-ascii-parser-primitives
 //
-//  Parseable conformances for standard library integer types.
+//  ASCII.Parseable conformances for standard library integer types.
 //
 
 public import Array_Dynamic_Primitives
+public import ASCII_Parser_Primitives_Core
 
-extension Int: @retroactive Parseable {
+extension Int: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, Int> { .init() }
 }
 
-extension UInt: @retroactive Parseable {
+extension UInt: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, UInt> { .init() }
 }
 
-extension Int8: @retroactive Parseable {
+extension Int8: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, Int8> { .init() }
 }
 
-extension Int16: @retroactive Parseable {
+extension Int16: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, Int16> { .init() }
 }
 
-extension Int32: @retroactive Parseable {
+extension Int32: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, Int32> { .init() }
 }
 
-extension Int64: @retroactive Parseable {
+extension Int64: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, Int64> { .init() }
 }
 
-extension UInt8: @retroactive Parseable {
+extension UInt8: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, UInt8> { .init() }
 }
 
-extension UInt16: @retroactive Parseable {
+extension UInt16: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, UInt16> { .init() }
 }
 
-extension UInt32: @retroactive Parseable {
+extension UInt32: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, UInt32> { .init() }
 }
 
-extension UInt64: @retroactive Parseable {
+extension UInt64: ASCII.Parseable, @retroactive Parseable {
     public static var parser: ASCII.Decimal.Parser<Parser.Input.Bytes, UInt64> { .init() }
 }
