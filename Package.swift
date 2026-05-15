@@ -44,6 +44,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../swift-ascii-primitives"),
+        .package(path: "../swift-byte-parser-primitives"),
         .package(path: "../swift-parser-primitives"),
     ],
     targets: [
@@ -78,6 +79,7 @@ let package = Package(
             name: "ASCII Parser Primitives Standard Library Integration",
             dependencies: [
                 "ASCII Decimal Parser Primitives",
+                .product(name: "Byte Parser Primitives", package: "swift-byte-parser-primitives"),
             ]
         ),
 
