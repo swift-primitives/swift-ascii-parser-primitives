@@ -2,6 +2,9 @@ import ASCII_Hexadecimal_Parser_Primitives
 import Parser_Primitives_Test_Support
 import Testing
 
+private typealias Cursor = Parser_Primitives.Input.Slice<Parser.Test.Bytes>
+
+
 // MARK: - Test Suite Structure
 
 @Suite("ASCII.Hexadecimal.Parser")
@@ -15,8 +18,8 @@ struct ASCIIHexadecimalParserTests {
 extension ASCIIHexadecimalParserTests.Unit {
     @Test
     func `parses lowercase hex`() throws {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, UInt32>()
-        var input: ByteInput = [0x64, 0x65, 0x61, 0x64]  // "dead"
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
+        var input: Cursor = [0x64, 0x65, 0x61, 0x64]  // "dead"
 
         let result = try parser.parse(&input)
 
@@ -25,8 +28,8 @@ extension ASCIIHexadecimalParserTests.Unit {
 
     @Test
     func `parses uppercase hex`() throws {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, UInt32>()
-        var input: ByteInput = [0x44, 0x45, 0x41, 0x44]  // "DEAD"
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
+        var input: Cursor = [0x44, 0x45, 0x41, 0x44]  // "DEAD"
 
         let result = try parser.parse(&input)
 
@@ -35,8 +38,8 @@ extension ASCIIHexadecimalParserTests.Unit {
 
     @Test
     func `parses mixed case hex`() throws {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, UInt32>()
-        var input: ByteInput = [0x44, 0x65, 0x41, 0x64]  // "DeAd"
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
+        var input: Cursor = [0x44, 0x65, 0x41, 0x64]  // "DeAd"
 
         let result = try parser.parse(&input)
 
@@ -45,8 +48,8 @@ extension ASCIIHexadecimalParserTests.Unit {
 
     @Test
     func `parses decimal digits as hex`() throws {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, UInt8>()
-        var input: ByteInput = [0x31, 0x30]  // "10"
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>()
+        var input: Cursor = [0x31, 0x30]  // "10"
 
         let result = try parser.parse(&input)
 
@@ -55,8 +58,8 @@ extension ASCIIHexadecimalParserTests.Unit {
 
     @Test
     func `stops at non-hex byte`() throws {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, UInt32>()
-        var input: ByteInput = [0x46, 0x46, 0x3B]  // "FF;"
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
+        var input: Cursor = [0x46, 0x46, 0x3B]  // "FF;"
 
         let result = try parser.parse(&input)
 
@@ -70,8 +73,8 @@ extension ASCIIHexadecimalParserTests.Unit {
 extension ASCIIHexadecimalParserTests.EdgeCase {
     @Test
     func `fails on empty input`() {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, Int>()
-        var input: ByteInput = []
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int>()
+        var input: Cursor = []
 
         #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
             try parser.parse(&input)
@@ -80,8 +83,8 @@ extension ASCIIHexadecimalParserTests.EdgeCase {
 
     @Test
     func `fails on non-hex first byte`() {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, Int>()
-        var input: ByteInput = [0x47]  // "G"
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int>()
+        var input: Cursor = [0x47]  // "G"
 
         #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
             try parser.parse(&input)
@@ -90,8 +93,8 @@ extension ASCIIHexadecimalParserTests.EdgeCase {
 
     @Test
     func `detects UInt8 overflow`() {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, UInt8>()
-        var input: ByteInput = [0x31, 0x30, 0x30]  // "100" = 256
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>()
+        var input: Cursor = [0x31, 0x30, 0x30]  // "100" = 256
 
         #expect(throws: ASCII.Hexadecimal.Error.overflow) {
             try parser.parse(&input)
@@ -100,8 +103,8 @@ extension ASCIIHexadecimalParserTests.EdgeCase {
 
     @Test
     func `boundary value UInt8 max`() throws {
-        let parser = ASCII.Hexadecimal.Parser<ByteInput, UInt8>()
-        var input: ByteInput = [0x46, 0x46]  // "FF"
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>()
+        var input: Cursor = [0x46, 0x46]  // "FF"
 
         let result = try parser.parse(&input)
 

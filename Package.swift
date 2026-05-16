@@ -122,7 +122,15 @@ let package = Package(
             dependencies: [
                 "ASCII Decimal Parser Primitives",
                 .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
-            ]
+            ],
+            // Swift 6.3.2 compiler ICE in opaque-return type-checking of
+            // `var body: some Parser_Primitives.Parser.`Protocol`<TypeParam, Output, Error>`
+            // when the test target depends on `Parser_Primitives_Test_Support`.
+            // FIXED upstream in Swift 6.4-dev (snapshot 2026-05-12-a).
+            // Remove this exclude when the workspace migrates to Swift 6.4+.
+            // See swift-institute/Issues/swift-issue-parameterized-typealias-opaque-return-ice/
+            // and swift-institute/Research/swift-compiler-bug-catalog.md § A8.
+            exclude: ["Declarative Parser Syntax Tests.swift"]
         ),
 
         // MARK: - Test Support
