@@ -5,6 +5,7 @@
 //  Parses a hexadecimal integer from ASCII bytes.
 //
 
+public import Byte_Primitives
 public import Collection_Primitives
 
 extension ASCII.Hexadecimal {
@@ -18,7 +19,7 @@ extension ASCII.Hexadecimal {
     /// let value = try hex.parse(&input) // e.g. 0xDEAD
     /// ```
     public struct Parser<Input: Collection.Slice.`Protocol`, T: FixedWidthInteger>: Sendable
-    where Input: Sendable, Input.Element == UInt8 {
+    where Input: Sendable, Input.Element == Byte {
         @inlinable
         public init() {}
     }
@@ -54,12 +55,13 @@ extension ASCII.Hexadecimal.Parser: Parser.`Protocol` {
     }
 
     @inlinable
-    static func _hexValue(_ byte: UInt8) -> T? {
-        switch byte {
-        case 0x30...0x39: T(byte &- 0x30)
-        case 0x41...0x46: T(byte &- 0x37)
-        case 0x61...0x66: T(byte &- 0x57)
-        default: nil
+    static func _hexValue(_ byte: Byte) -> T? {
+        let raw = byte.underlying
+        switch raw {
+        case 0x30...0x39: return T(raw &- 0x30)
+        case 0x41...0x46: return T(raw &- 0x37)
+        case 0x61...0x66: return T(raw &- 0x57)
+        default: return nil
         }
     }
 }

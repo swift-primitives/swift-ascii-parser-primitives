@@ -5,6 +5,7 @@
 //  Parses a decimal integer from ASCII bytes.
 //
 
+public import Byte_Primitives
 public import Collection_Primitives
 
 extension ASCII.Decimal {
@@ -18,7 +19,7 @@ extension ASCII.Decimal {
     /// let value = try port.parse(&input) // e.g. 8080
     /// ```
     public struct Parser<Input: Collection.Slice.`Protocol`, T: FixedWidthInteger>: Sendable
-    where Input: Sendable, Input.Element == UInt8 {
+    where Input: Sendable, Input.Element == Byte {
         @inlinable
         public init() {}
     }
@@ -39,7 +40,7 @@ extension ASCII.Decimal.Parser: Parser.`Protocol` {
             guard byte >= 0x30, byte <= 0x39 else {
                 break
             }
-            let digit = T(byte &- 0x30)
+            let digit = T(byte.underlying &- 0x30)
             let (product, mulOverflow) = result.multipliedReportingOverflow(by: 10)
             guard !mulOverflow else { throw .overflow }
             let (sum, addOverflow) = product.addingReportingOverflow(digit)
