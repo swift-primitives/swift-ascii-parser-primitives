@@ -177,6 +177,138 @@ extension ASCII.Decimal.Float.Parser: Parser.`Protocol` {
     }
 }
 
+// MARK: - Span Entry Point
+
+extension ASCII.Decimal.Float {
+    /// Parses an ASCII decimal float literal from a borrowed
+    /// `Swift.Span<UInt8>` and returns the corresponding `Double`.
+    ///
+    /// Hot-path entry for callers that already have contiguous byte
+    /// storage (e.g. JSON's `lexNumberValue`). Same algorithm as
+    /// ``Parser/parse(_:)`` but without `inout` consumption: the
+    /// entire span is parsed or the call throws.
+    ///
+    /// - Parameter span: ASCII decimal float bytes
+    ///   (`-? digit+ ('.' digit+)? ([eE] [+-]? digit+)?`).
+    /// - Returns: The corresponding `Double`. `.infinity` / `0.0` are
+    ///   valid returns for magnitudes outside binary64 range.
+    /// - Throws: ``Error`` on syntactic failure.
+    @inlinable
+    public static func parse(
+        _ span: borrowing Swift.Span<UInt8>
+    ) throws(ASCII.Decimal.Float.Error) -> Double {
+        guard !span.isEmpty else { throw .empty }
+
+        var i = 0
+        let end = span.count
+        var negative = false
+
+        let first = span[i]
+        if first == 0x2D {              // '-'
+            negative = true
+            i &+= 1
+        } else if first == 0x2B {       // '+'
+            i &+= 1
+        }
+
+        var mantissa: UInt64 = 0
+        var nSignificantDigits = 0
+        var nDigitsAfterPoint = 0
+        var tooManyDigits = false
+        var sawAnyDigit = false
+
+        // Integer digits
+        while i < end {
+            let b = span[i]
+            guard b >= 0x30, b <= 0x39 else { break }
+            sawAnyDigit = true
+            if nSignificantDigits < 19 {
+                mantissa = mantissa &* 10 &+ UInt64(b &- 0x30)
+                nSignificantDigits &+= 1
+            } else {
+                tooManyDigits = true
+            }
+            i &+= 1
+        }
+
+        // Fraction
+        if i < end, span[i] == 0x2E {
+            i &+= 1
+            while i < end {
+                let b = span[i]
+                guard b >= 0x30, b <= 0x39 else { break }
+                sawAnyDigit = true
+                if nSignificantDigits < 19 {
+                    mantissa = mantissa &* 10 &+ UInt64(b &- 0x30)
+                    nSignificantDigits &+= 1
+                } else {
+                    tooManyDigits = true
+                }
+                nDigitsAfterPoint &+= 1
+                i &+= 1
+            }
+        }
+
+        guard sawAnyDigit else { throw .missingDigits }
+
+        // Exponent
+        var explicitExp = 0
+        let beforeExp = i
+        if i < end {
+            let b = span[i]
+            if b == 0x65 || b == 0x45 {
+                i &+= 1
+                var expNegative = false
+                if i < end {
+                    let s = span[i]
+                    if s == 0x2D {
+                        expNegative = true
+                        i &+= 1
+                    } else if s == 0x2B {
+                        i &+= 1
+                    }
+                }
+                var expValue = 0
+                var sawExpDigit = false
+                while i < end {
+                    let b = span[i]
+                    guard b >= 0x30, b <= 0x39 else { break }
+                    sawExpDigit = true
+                    if expValue < 100_000 {
+                        expValue = expValue &* 10 &+ Int(b &- 0x30)
+                    }
+                    i &+= 1
+                }
+                if !sawExpDigit {
+                    i = beforeExp
+                } else {
+                    explicitExp = expNegative ? -expValue : expValue
+                }
+            }
+        }
+
+        let q = explicitExp - nDigitsAfterPoint
+
+        if !tooManyDigits, let fast = clingerFastPath(
+            negative: negative, mantissa: mantissa, q: q
+        ) {
+            return fast
+        } else if !tooManyDigits {
+            return eiselLemire(
+                negative: negative, mantissa: mantissa, q: q
+            )
+        } else {
+            // Slow path: reconstruct prefix-of-span bytes for stdlib.
+            var bytes: [UInt8] = []
+            bytes.reserveCapacity(i)
+            for j in 0..<i { bytes.append(span[j]) }
+            let str = Swift.String(decoding: bytes, as: Swift.UTF8.self)
+            guard let v = Double(str), v.isFinite else { throw .overflow }
+            return v
+        }
+    }
+}
+
 // MARK: - Clinger Fast Path
 
 extension ASCII.Decimal.Float {
