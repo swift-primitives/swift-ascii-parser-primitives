@@ -11,6 +11,7 @@
 //
 
 public import Collection_Primitives
+public import Byte_Primitives
 
 extension ASCII.Decimal.Float {
     /// A parser that consumes an ASCII decimal floating-point literal
@@ -195,7 +196,7 @@ extension ASCII.Decimal.Float {
     /// - Throws: ``Error`` on syntactic failure.
     @inlinable
     public static func parse(
-        _ span: borrowing Swift.Span<UInt8>
+        _ span: borrowing Swift.Span<Byte>
     ) throws(ASCII.Decimal.Float.Error) -> Double {
         guard !span.isEmpty else { throw .empty }
 
@@ -203,6 +204,11 @@ extension ASCII.Decimal.Float {
         let end = span.count
         var negative = false
 
+        // Byte literals (0x2D, 0x30, etc.) round-trip via Byte's
+        // ExpressibleByIntegerLiteral conformance. Arithmetic operations
+        // (`&-`, `&*`, `&+`) take Byte's `.underlying` UInt8 because Byte
+        // intentionally does NOT forward arithmetic (Byte is a domain
+        // marker, not an integer algebra element).
         let first = span[i]
         if first == 0x2D {              // '-'
             negative = true
@@ -223,7 +229,7 @@ extension ASCII.Decimal.Float {
             guard b >= 0x30, b <= 0x39 else { break }
             sawAnyDigit = true
             if nSignificantDigits < 19 {
-                mantissa = mantissa &* 10 &+ UInt64(b &- 0x30)
+                mantissa = mantissa &* 10 &+ UInt64(b.underlying &- 0x30)
                 nSignificantDigits &+= 1
             } else {
                 tooManyDigits = true
@@ -239,7 +245,7 @@ extension ASCII.Decimal.Float {
                 guard b >= 0x30, b <= 0x39 else { break }
                 sawAnyDigit = true
                 if nSignificantDigits < 19 {
-                    mantissa = mantissa &* 10 &+ UInt64(b &- 0x30)
+                    mantissa = mantissa &* 10 &+ UInt64(b.underlying &- 0x30)
                     nSignificantDigits &+= 1
                 } else {
                     tooManyDigits = true
@@ -275,7 +281,7 @@ extension ASCII.Decimal.Float {
                     guard b >= 0x30, b <= 0x39 else { break }
                     sawExpDigit = true
                     if expValue < 100_000 {
-                        expValue = expValue &* 10 &+ Int(b &- 0x30)
+                        expValue = expValue &* 10 &+ Int(b.underlying &- 0x30)
                     }
                     i &+= 1
                 }
@@ -298,10 +304,13 @@ extension ASCII.Decimal.Float {
                 negative: negative, mantissa: mantissa, q: q
             )
         } else {
-            // Slow path: reconstruct prefix-of-span bytes for stdlib.
+            // Slow path (>19-digit mantissa): reconstruct prefix bytes
+            // and route through stdlib's Double(_: String). Byte's
+            // `.underlying` at the stdlib boundary (UTF8.self requires
+            // UInt8) is the legitimate conversion site.
             var bytes: [UInt8] = []
             bytes.reserveCapacity(i)
-            for j in 0..<i { bytes.append(span[j]) }
+            for j in 0..<i { bytes.append(span[j].underlying) }
             let str = Swift.String(decoding: bytes, as: Swift.UTF8.self)
             guard let v = Double(str), v.isFinite else { throw .overflow }
             return v
