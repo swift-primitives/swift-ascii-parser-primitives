@@ -5,7 +5,7 @@
 //  ASCII.Parseable conformances for standard library integer types.
 //
 
-public import Array_Dynamic_Primitives
+public import Array_Primitives
 public import ASCII_Decimal_Parser_Primitives
 public import ASCII_Parser_Primitives_Core
 public import Byte_Parser_Primitives
