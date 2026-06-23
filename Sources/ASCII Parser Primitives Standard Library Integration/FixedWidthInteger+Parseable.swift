@@ -7,11 +7,10 @@
 
 public import Array_Primitives
 public import ASCII_Decimal_Parser_Primitives
-public import ASCII_Parser_Primitives_Core
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
 public import Byte_Parser_Primitives
-public import Parser_Primitives_Core
+public import Parseable_ASCII_Primitives
 public import Shared_Primitive
 
 // MARK: - Sibling-shape ASCII.Parseable conformances

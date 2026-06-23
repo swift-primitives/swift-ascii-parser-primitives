@@ -22,6 +22,10 @@ let package = Package(
             targets: ["ASCII Parser Primitives Core"]
         ),
         .library(
+            name: "Parseable ASCII Primitives",
+            targets: ["Parseable ASCII Primitives"]
+        ),
+        .library(
             name: "ASCII Decimal Parser Primitives",
             targets: ["ASCII Decimal Parser Primitives"]
         ),
@@ -50,11 +54,26 @@ let package = Package(
         .package(url: "https://github.com/swift-primitives/swift-shared-primitives.git", branch: "main"),
     ],
     targets: [
-        // MARK: - Core
+        // MARK: - Sub-namespace
 
+        // Owns `extension ASCII { protocol Parseable }` — the ASCII-substrate
+        // sibling protocol. Extends the upstream `ASCII` namespace, so it has
+        // no zero-dep root of its own (discipline package, [MOD-017]/§7).
+        .target(
+            name: "Parseable ASCII Primitives",
+            dependencies: [
+                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
+            ]
+        ),
+
+        // MARK: - Core (transitional shim)
+
+        // DEPRECATED — exports-only shim (L1 core-dissolution sweep 2026-06-23).
+        // Re-exports the dissolved Core surface; removed in the cleanup wave.
         .target(
             name: "ASCII Parser Primitives Core",
             dependencies: [
+                "Parseable ASCII Primitives",
                 .product(name: "Parser Primitives Core", package: "swift-parser-primitives"),
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
             ]
@@ -65,13 +84,15 @@ let package = Package(
         .target(
             name: "ASCII Decimal Parser Primitives",
             dependencies: [
-                "ASCII Parser Primitives Core",
+                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
+                .product(name: "Parser Primitives Core", package: "swift-parser-primitives"),
             ]
         ),
         .target(
             name: "ASCII Hexadecimal Parser Primitives",
             dependencies: [
-                "ASCII Parser Primitives Core",
+                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
+                .product(name: "Parser Primitives Core", package: "swift-parser-primitives"),
             ]
         ),
 
@@ -81,6 +102,7 @@ let package = Package(
             name: "ASCII Parser Primitives Standard Library Integration",
             dependencies: [
                 "ASCII Decimal Parser Primitives",
+                "Parseable ASCII Primitives",
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
                 .product(name: "Byte Parser Primitives", package: "swift-byte-parser-primitives"),
@@ -93,6 +115,7 @@ let package = Package(
         .target(
             name: "ASCII Parser Primitives",
             dependencies: [
+                "Parseable ASCII Primitives",
                 "ASCII Decimal Parser Primitives",
                 "ASCII Hexadecimal Parser Primitives",
                 "ASCII Parser Primitives Standard Library Integration",
