@@ -85,14 +85,14 @@ let package = Package(
             name: "ASCII Decimal Parser Primitives",
             dependencies: [
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
-                .product(name: "Parser Primitives Core", package: "swift-parser-primitives"),
+                .product(name: "Parser Primitives", package: "swift-parser-primitives"),
             ]
         ),
         .target(
             name: "ASCII Hexadecimal Parser Primitives",
             dependencies: [
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
-                .product(name: "Parser Primitives Core", package: "swift-parser-primitives"),
+                .product(name: "Parser Primitives", package: "swift-parser-primitives"),
             ]
         ),
 
