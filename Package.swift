@@ -18,10 +18,6 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "ASCII Parser Primitives Core",
-            targets: ["ASCII Parser Primitives Core"]
-        ),
-        .library(
             name: "Parseable ASCII Primitives",
             targets: ["Parseable ASCII Primitives"]
         ),
@@ -62,19 +58,6 @@ let package = Package(
         .target(
             name: "Parseable ASCII Primitives",
             dependencies: [
-                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
-            ]
-        ),
-
-        // MARK: - Core (transitional shim)
-
-        // DEPRECATED — exports-only shim (L1 core-dissolution sweep 2026-06-23).
-        // Re-exports the dissolved Core surface; removed in the cleanup wave.
-        .target(
-            name: "ASCII Parser Primitives Core",
-            dependencies: [
-                "Parseable ASCII Primitives",
-                .product(name: "Parser Primitives Core", package: "swift-parser-primitives"),
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
             ]
         ),
