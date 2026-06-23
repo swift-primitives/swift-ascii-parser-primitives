@@ -44,8 +44,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swift-primitives/swift-ascii-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-byte-parser-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-parser-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-shared-primitives.git", branch: "main"),
     ],
     targets: [
         // MARK: - Core
@@ -79,7 +81,10 @@ let package = Package(
             name: "ASCII Parser Primitives Standard Library Integration",
             dependencies: [
                 "ASCII Decimal Parser Primitives",
+                .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
+                .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
                 .product(name: "Byte Parser Primitives", package: "swift-byte-parser-primitives"),
+                .product(name: "Shared Primitive", package: "swift-shared-primitives"),
             ]
         ),
 
