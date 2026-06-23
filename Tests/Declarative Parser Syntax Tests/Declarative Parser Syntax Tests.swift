@@ -22,10 +22,11 @@
 //
 
 import ASCII_Decimal_Parser_Primitives
+import Input_Primitives
 import Parser_Primitives_Test_Support
 import Testing
 
-private typealias Cursor = Parser_Primitives.Input.Slice<Parser.Test.Bytes>
+private typealias Cursor = Input_Primitives.Input.Slice<Parser.Test.Bytes>
 
 
 // MARK: - Test Suite
