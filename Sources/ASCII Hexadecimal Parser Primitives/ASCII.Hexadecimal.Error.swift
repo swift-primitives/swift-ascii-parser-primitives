@@ -15,5 +15,10 @@ extension ASCII.Hexadecimal {
         /// digit bytes, but fewer were available before a non-digit byte or the
         /// end of input. Also thrown for the degenerate `exactly(0)` policy.
         case insufficientDigits
+        /// The input carried a leading `-` (0x2D) sign byte under the
+        /// `ASCII.Digits.Sign.optional` policy, but the target integer type is
+        /// unsigned and cannot represent a negative value. A leading `+` (0x2B)
+        /// is always accepted.
+        case invalidSign
     }
 }

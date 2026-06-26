@@ -18,6 +18,7 @@ struct ASCIIHexadecimalParserTests {
     @Suite struct Unit {}
     @Suite struct EdgeCase {}
     @Suite struct CountPolicy {}
+    @Suite struct SignPolicy {}
 }
 
 // MARK: - Unit Tests
@@ -225,5 +226,141 @@ extension ASCIIHexadecimalParserTests.CountPolicy {
         #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
             try parser.parse(&input)
         }
+    }
+}
+
+// MARK: - Sign Policy Tests
+
+extension ASCIIHexadecimalParserTests.SignPolicy {
+    @Test
+    func `none default leaves a leading plus unconsumed`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int>()  // sign: .none
+        var input = Byte.Input.bytes(0x2B, 0x66, 0x66)  // "+ff"
+
+        // '+' is not a hex digit, so the default no-sign policy reads no digits.
+        #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2B)  // input unchanged on throw
+    }
+
+    @Test
+    func `none default leaves a leading minus unconsumed`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int>()  // sign: .none
+        var input = Byte.Input.bytes(0x2D, 0x66, 0x66)  // "-ff"
+
+        #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2D)  // input unchanged on throw
+    }
+
+    @Test
+    func `optional consumes a leading plus`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int16>(sign: .optional)
+        var input = Byte.Input.bytes(0x2B, 0x66, 0x66)  // "+ff"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 255)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `optional consumes a leading minus`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int16>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D, 0x66, 0x66)  // "-ff"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == -255)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `optional with no sign is positive`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int16>(sign: .optional)
+        var input = Byte.Input.bytes(0x66, 0x66)  // "ff"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 255)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `Int8 minimum is reachable`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int8>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D, 0x38, 0x30)  // "-80" = -128
+
+        let result = try parser.parse(&input)
+
+        #expect(result == -128)
+        #expect(result == Int8.min)
+    }
+
+    @Test
+    func `Int8 below minimum overflows`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int8>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D, 0x38, 0x31)  // "-81" = -129
+
+        #expect(throws: ASCII.Hexadecimal.Error.overflow) {
+            try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `negative into unsigned throws invalidSign`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D, 0x35)  // "-5"
+
+        #expect(throws: ASCII.Hexadecimal.Error.invalidSign) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2D)  // input unchanged on throw
+    }
+
+    @Test
+    func `positive into unsigned is accepted`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>(sign: .optional)
+        var input = Byte.Input.bytes(0x2B, 0x35)  // "+5"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 5)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `lone minus has no digits`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D)  // "-"
+
+        #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2D)  // input unchanged on throw
+    }
+
+    @Test
+    func `lone plus has no digits`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int>(sign: .optional)
+        var input = Byte.Input.bytes(0x2B)  // "+"
+
+        #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2B)  // input unchanged on throw
+    }
+
+    @Test
+    func `optional sign with exactly leaves the remainder`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, Int16>(sign: .optional, count: .exactly(2))
+        var input = Byte.Input.bytes(0x2D, 0x66, 0x66, 0x30)  // "-ff0"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == -255)
+        #expect(input.first == 0x30)  // remainder "0"
     }
 }

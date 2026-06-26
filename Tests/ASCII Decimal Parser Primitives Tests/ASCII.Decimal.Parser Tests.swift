@@ -18,6 +18,7 @@ struct ASCIIDecimalParserTests {
     @Suite struct Unit {}
     @Suite struct EdgeCase {}
     @Suite struct CountPolicy {}
+    @Suite struct SignPolicy {}
 }
 
 // MARK: - Unit Tests
@@ -249,5 +250,183 @@ extension ASCIIDecimalParserTests.CountPolicy {
         #expect(throws: ASCII.Decimal.Error.noDigits) {
             try parser.parse(&input)
         }
+    }
+}
+
+// MARK: - Sign Policy Tests
+
+extension ASCIIDecimalParserTests.SignPolicy {
+    @Test
+    func `none default leaves a leading plus unconsumed`() {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>()  // sign: .none
+        var input = Byte.Input.bytes(0x2B, 0x31, 0x32, 0x33)  // "+123"
+
+        // '+' is not a digit, so the default no-sign policy reads no digits.
+        #expect(throws: ASCII.Decimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2B)  // input unchanged on throw
+    }
+
+    @Test
+    func `none default leaves a leading minus unconsumed`() {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>()  // sign: .none
+        var input = Byte.Input.bytes(0x2D, 0x31, 0x32, 0x33)  // "-123"
+
+        #expect(throws: ASCII.Decimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2D)  // input unchanged on throw
+    }
+
+    @Test
+    func `optional consumes a leading plus`() throws {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>(sign: .optional)
+        var input = Byte.Input.bytes(0x2B, 0x31, 0x32, 0x33)  // "+123"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 123)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `optional consumes a leading minus`() throws {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D, 0x31, 0x32, 0x33)  // "-123"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == -123)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `optional with no sign is positive`() throws {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>(sign: .optional)
+        var input = Byte.Input.bytes(0x31, 0x32, 0x33)  // "123"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 123)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `Int8 minimum is reachable`() throws {
+        let parser = ASCII.Decimal.Parser<Cursor, Int8>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D, 0x31, 0x32, 0x38)  // "-128"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == -128)
+        #expect(result == Int8.min)
+    }
+
+    @Test
+    func `Int8 below minimum overflows`() {
+        let parser = ASCII.Decimal.Parser<Cursor, Int8>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D, 0x31, 0x32, 0x39)  // "-129"
+
+        #expect(throws: ASCII.Decimal.Error.overflow) {
+            try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `Int8 maximum is reachable`() throws {
+        let parser = ASCII.Decimal.Parser<Cursor, Int8>(sign: .optional)
+        var input = Byte.Input.bytes(0x31, 0x32, 0x37)  // "127"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 127)
+        #expect(result == Int8.max)
+    }
+
+    @Test
+    func `Int8 above maximum overflows`() {
+        let parser = ASCII.Decimal.Parser<Cursor, Int8>(sign: .optional)
+        var input = Byte.Input.bytes(0x31, 0x32, 0x38)  // "128"
+
+        #expect(throws: ASCII.Decimal.Error.overflow) {
+            try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `negative into unsigned throws invalidSign`() {
+        let parser = ASCII.Decimal.Parser<Cursor, UInt8>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D, 0x35)  // "-5"
+
+        #expect(throws: ASCII.Decimal.Error.invalidSign) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2D)  // input unchanged on throw
+    }
+
+    @Test
+    func `positive into unsigned is accepted`() throws {
+        let parser = ASCII.Decimal.Parser<Cursor, UInt8>(sign: .optional)
+        var input = Byte.Input.bytes(0x2B, 0x35)  // "+5"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 5)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `lone minus has no digits`() {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>(sign: .optional)
+        var input = Byte.Input.bytes(0x2D)  // "-"
+
+        #expect(throws: ASCII.Decimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2D)  // input unchanged on throw
+    }
+
+    @Test
+    func `lone plus has no digits`() {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>(sign: .optional)
+        var input = Byte.Input.bytes(0x2B)  // "+"
+
+        #expect(throws: ASCII.Decimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
+        #expect(input.first == 0x2B)  // input unchanged on throw
+    }
+
+    @Test
+    func `optional sign with exactly shortfall throws insufficientDigits`() {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>(sign: .optional, count: .exactly(3))
+        var input = Byte.Input.bytes(0x2D, 0x31, 0x32)  // "-12" — two digits after sign
+
+        #expect(throws: ASCII.Decimal.Error.insufficientDigits) {
+            try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `optional sign with exactly exact count`() throws {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>(sign: .optional, count: .exactly(3))
+        var input = Byte.Input.bytes(0x2D, 0x31, 0x32, 0x33)  // "-123"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == -123)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `optional sign with exactly leaves the remainder`() throws {
+        let parser = ASCII.Decimal.Parser<Cursor, Int>(sign: .optional, count: .exactly(3))
+        var input = Byte.Input.bytes(0x2D, 0x31, 0x32, 0x33, 0x34)  // "-1234"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == -123)
+        #expect(input.first == 0x34)  // remainder "4"
     }
 }

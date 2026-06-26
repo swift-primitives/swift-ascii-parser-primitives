@@ -20,18 +20,27 @@ extension ASCII.Hexadecimal {
     ///
     /// // Fixed-width: consume exactly two hex digits (e.g. one byte).
     /// let octet = ASCII.Hexadecimal.Parser<Input, UInt8>(count: .exactly(2))
+    ///
+    /// // Signed: consume an optional leading '+'/'-' (e.g. -0xFF).
+    /// let signed = ASCII.Hexadecimal.Parser<Input, Int16>(sign: .optional)
     /// ```
     public struct Parser<Input: Collection.Slice.`Protocol`, T: FixedWidthInteger>: Sendable
     where Input: Sendable, Input.Element == Byte {
+        /// The sign policy governing whether a leading sign byte is consumed.
+        public let sign: ASCII.Digits.Sign
         /// The digit-count policy governing how many digit bytes are consumed.
         public let count: ASCII.Digits.Count
 
         /// Creates a hexadecimal parser.
         ///
-        /// - Parameter count: the digit-count policy. Defaults to ``ASCII/Digits/Count/greedy``,
-        ///   which consumes every available hexadecimal digit byte — the historical behavior.
+        /// - Parameters:
+        ///   - sign: the sign policy. Defaults to ``ASCII/Digits/Sign/none``,
+        ///     which consumes no leading sign byte — the historical behavior.
+        ///   - count: the digit-count policy. Defaults to ``ASCII/Digits/Count/greedy``,
+        ///     which consumes every available hexadecimal digit byte — the historical behavior.
         @inlinable
-        public init(count: ASCII.Digits.Count = .greedy) {
+        public init(sign: ASCII.Digits.Sign = .none, count: ASCII.Digits.Count = .greedy) {
+            self.sign = sign
             self.count = count
         }
     }
@@ -58,16 +67,39 @@ extension ASCII.Hexadecimal.Parser: Parser.`Protocol` {
         var consumed = 0
         var index = input.startIndex
 
+        // Sign handling runs BEFORE the digit loop and only under `.optional`.
+        // `.none` peeks nothing — byte-for-byte the historical behavior. Under
+        // `.optional` a leading `+` (0x2B) selects positive and a leading `-`
+        // (0x2D) selects negative; either is consumed when present. Advancing
+        // only the local `index` keeps the throw paths non-consuming (the input
+        // is committed via the final slice solely on success).
+        var negative = false
+        if sign == .optional, index < input.endIndex {
+            let byte = input[index]
+            if byte == 0x2B {
+                input.formIndex(after: &index)
+            } else if byte == 0x2D {
+                guard T.isSigned else { throw .invalidSign }
+                negative = true
+                input.formIndex(after: &index)
+            }
+        }
+
         while index < input.endIndex {
             if let limit, consumed == limit { break }
             let byte = input[index]
             guard let digit = Self._hexValue(byte) else { break }
 
+            // Accumulate magnitude in the sign's direction so that `T.min` is
+            // reachable. Parsing positive-then-negating would overflow on the
+            // most-negative value.
             let (shifted, shiftOverflow) = result.multipliedReportingOverflow(by: 16)
             guard !shiftOverflow else { throw .overflow }
-            let (sum, addOverflow) = shifted.addingReportingOverflow(digit)
-            guard !addOverflow else { throw .overflow }
-            result = sum
+            let combined = negative
+                ? shifted.subtractingReportingOverflow(digit)
+                : shifted.addingReportingOverflow(digit)
+            guard !combined.overflow else { throw .overflow }
+            result = combined.partialValue
             input.formIndex(after: &index)
             consumed += 1
         }
