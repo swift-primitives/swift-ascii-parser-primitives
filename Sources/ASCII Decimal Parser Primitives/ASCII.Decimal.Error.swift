@@ -11,5 +11,9 @@ extension ASCII.Decimal {
         case noDigits
         /// The parsed value would overflow the target integer type.
         case overflow
+        /// A fixed-count policy (`ASCII.Digits.Count.exactly(n)`) required `n`
+        /// digit bytes, but fewer were available before a non-digit byte or the
+        /// end of input. Also thrown for the degenerate `exactly(0)` policy.
+        case insufficientDigits
     }
 }

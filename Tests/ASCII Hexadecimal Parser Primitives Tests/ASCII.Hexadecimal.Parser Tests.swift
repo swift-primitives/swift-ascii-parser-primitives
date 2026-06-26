@@ -1,9 +1,14 @@
 import ASCII_Hexadecimal_Parser_Primitives
-import Input_Primitives
-import Parser_Primitives_Test_Support
+import ASCII_Parser_Primitives_Test_Support
+import Byte_Parser_Primitives
 import Testing
 
-private typealias Cursor = Input_Primitives.Input.Slice<Parser.Test.Bytes>
+// `Byte.Input` is the canonical byte-stream input — the same input the Standard
+// Library Integration target feeds to `ASCII.Decimal.Parser<Byte.Input, …>`. It
+// vends `Element == Byte`, which the parser requires. Inputs are built with the
+// `Byte.Input.bytes(_:)` factory from the Test Support module (an array-literal
+// conformance is impossible — see `Byte.Input+Bytes.swift`).
+private typealias Cursor = Byte.Input
 
 
 // MARK: - Test Suite Structure
@@ -12,6 +17,7 @@ private typealias Cursor = Input_Primitives.Input.Slice<Parser.Test.Bytes>
 struct ASCIIHexadecimalParserTests {
     @Suite struct Unit {}
     @Suite struct EdgeCase {}
+    @Suite struct CountPolicy {}
 }
 
 // MARK: - Unit Tests
@@ -20,7 +26,7 @@ extension ASCIIHexadecimalParserTests.Unit {
     @Test
     func `parses lowercase hex`() throws {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
-        var input: Cursor = [0x64, 0x65, 0x61, 0x64]  // "dead"
+        var input = Byte.Input.bytes(0x64, 0x65, 0x61, 0x64)  // "dead"
 
         let result = try parser.parse(&input)
 
@@ -30,7 +36,7 @@ extension ASCIIHexadecimalParserTests.Unit {
     @Test
     func `parses uppercase hex`() throws {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
-        var input: Cursor = [0x44, 0x45, 0x41, 0x44]  // "DEAD"
+        var input = Byte.Input.bytes(0x44, 0x45, 0x41, 0x44)  // "DEAD"
 
         let result = try parser.parse(&input)
 
@@ -40,7 +46,7 @@ extension ASCIIHexadecimalParserTests.Unit {
     @Test
     func `parses mixed case hex`() throws {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
-        var input: Cursor = [0x44, 0x65, 0x41, 0x64]  // "DeAd"
+        var input = Byte.Input.bytes(0x44, 0x65, 0x41, 0x64)  // "DeAd"
 
         let result = try parser.parse(&input)
 
@@ -50,7 +56,7 @@ extension ASCIIHexadecimalParserTests.Unit {
     @Test
     func `parses decimal digits as hex`() throws {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>()
-        var input: Cursor = [0x31, 0x30]  // "10"
+        var input = Byte.Input.bytes(0x31, 0x30)  // "10"
 
         let result = try parser.parse(&input)
 
@@ -60,7 +66,7 @@ extension ASCIIHexadecimalParserTests.Unit {
     @Test
     func `stops at non-hex byte`() throws {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
-        var input: Cursor = [0x46, 0x46, 0x3B]  // "FF;"
+        var input = Byte.Input.bytes(0x46, 0x46, 0x3B)  // "FF;"
 
         let result = try parser.parse(&input)
 
@@ -75,7 +81,7 @@ extension ASCIIHexadecimalParserTests.EdgeCase {
     @Test
     func `fails on empty input`() {
         let parser = ASCII.Hexadecimal.Parser<Cursor, Int>()
-        var input: Cursor = []
+        var input = Byte.Input.bytes()
 
         #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
             try parser.parse(&input)
@@ -85,7 +91,7 @@ extension ASCIIHexadecimalParserTests.EdgeCase {
     @Test
     func `fails on non-hex first byte`() {
         let parser = ASCII.Hexadecimal.Parser<Cursor, Int>()
-        var input: Cursor = [0x47]  // "G"
+        var input = Byte.Input.bytes(0x47)  // "G"
 
         #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
             try parser.parse(&input)
@@ -95,7 +101,7 @@ extension ASCIIHexadecimalParserTests.EdgeCase {
     @Test
     func `detects UInt8 overflow`() {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>()
-        var input: Cursor = [0x31, 0x30, 0x30]  // "100" = 256
+        var input = Byte.Input.bytes(0x31, 0x30, 0x30)  // "100" = 256
 
         #expect(throws: ASCII.Hexadecimal.Error.overflow) {
             try parser.parse(&input)
@@ -105,10 +111,119 @@ extension ASCIIHexadecimalParserTests.EdgeCase {
     @Test
     func `boundary value UInt8 max`() throws {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>()
-        var input: Cursor = [0x46, 0x46]  // "FF"
+        var input = Byte.Input.bytes(0x46, 0x46)  // "FF"
 
         let result = try parser.parse(&input)
 
         #expect(result == 255)
+    }
+}
+
+// MARK: - Count Policy Tests
+
+extension ASCIIHexadecimalParserTests.CountPolicy {
+    @Test
+    func `greedy default consumes all digits`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>(count: .greedy)
+        var input = Byte.Input.bytes(0x64, 0x65, 0x61, 0x64)  // "dead"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 0xDEAD)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `exactly consumes exactly n digits and stops`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>(count: .exactly(2))
+        var input = Byte.Input.bytes(0x46, 0x46, 0x30, 0x30)  // "FF00"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 0xFF)
+        #expect(input.first == 0x30)  // remainder "00"
+    }
+
+    @Test
+    func `exactly shortfall throws insufficientDigits`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt16>(count: .exactly(4))
+        var input = Byte.Input.bytes(0x41, 0x42)  // "AB" — only two digits
+
+        #expect(throws: ASCII.Hexadecimal.Error.insufficientDigits) {
+            try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `exactly shortfall on non-hex throws insufficientDigits`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt16>(count: .exactly(3))
+        var input = Byte.Input.bytes(0x41, 0x42, 0x47)  // "ABG" — 'G' is not hex
+
+        #expect(throws: ASCII.Hexadecimal.Error.insufficientDigits) {
+            try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `exactly zero is degenerate and throws`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt16>(count: .exactly(0))
+        var input = Byte.Input.bytes(0x41, 0x42)  // "AB"
+
+        #expect(throws: ASCII.Hexadecimal.Error.insufficientDigits) {
+            try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `exactly preserves overflow check`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>(count: .exactly(3))
+        var input = Byte.Input.bytes(0x31, 0x30, 0x30)  // "100" = 256 > UInt8.max
+
+        #expect(throws: ASCII.Hexadecimal.Error.overflow) {
+            try parser.parse(&input)
+        }
+    }
+
+    @Test
+    func `atMost caps and leaves the remainder`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt8>(count: .atMost(2))
+        var input = Byte.Input.bytes(0x41, 0x42, 0x43, 0x44)  // "ABCD"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 0xAB)
+        #expect(input.first == 0x43)  // remainder "CD"
+    }
+
+    @Test
+    func `atMost stops early at a non-hex byte`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>(count: .atMost(5))
+        var input = Byte.Input.bytes(0x46, 0x3B)  // "F;" — fewer digits than the cap
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 0xF)
+        #expect(input.first == 0x3B)
+    }
+
+    @Test
+    func `atMost bigger than available consumes all`() throws {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>(count: .atMost(10))
+        var input = Byte.Input.bytes(0x44, 0x45, 0x41, 0x44)  // "DEAD"
+
+        let result = try parser.parse(&input)
+
+        #expect(result == 0xDEAD)
+        #expect(input.isEmpty)
+    }
+
+    @Test
+    func `atMost requires at least one digit`() {
+        let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>(count: .atMost(3))
+        var input = Byte.Input.bytes(0x47)  // "G"
+
+        #expect(throws: ASCII.Hexadecimal.Error.noDigits) {
+            try parser.parse(&input)
+        }
     }
 }

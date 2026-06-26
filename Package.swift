@@ -111,14 +111,14 @@ let package = Package(
             name: "ASCII Decimal Parser Primitives Tests",
             dependencies: [
                 "ASCII Decimal Parser Primitives",
-                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+                "ASCII Parser Primitives Test Support",
             ]
         ),
         .testTarget(
             name: "ASCII Hexadecimal Parser Primitives Tests",
             dependencies: [
                 "ASCII Hexadecimal Parser Primitives",
-                .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
+                "ASCII Parser Primitives Test Support",
             ]
         ),
         .testTarget(
@@ -149,6 +149,7 @@ let package = Package(
             name: "ASCII Parser Primitives Test Support",
             dependencies: [
                 "ASCII Parser Primitives",
+                .product(name: "Byte Parser Primitives", package: "swift-byte-parser-primitives"),
                 .product(name: "Parser Primitives Test Support", package: "swift-parser-primitives"),
             ],
             path: "Tests/Support"

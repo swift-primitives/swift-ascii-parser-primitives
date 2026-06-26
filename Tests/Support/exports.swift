@@ -1,2 +1,3 @@
 @_exported public import ASCII_Parser_Primitives
+@_exported public import Byte_Parser_Primitives
 @_exported public import Parser_Primitives_Test_Support
