@@ -30,6 +30,14 @@ let package = Package(
             targets: ["ASCII Hexadecimal Parser Primitives"]
         ),
         .library(
+            name: "ASCII Binary Parser Primitives",
+            targets: ["ASCII Binary Parser Primitives"]
+        ),
+        .library(
+            name: "ASCII Octal Parser Primitives",
+            targets: ["ASCII Octal Parser Primitives"]
+        ),
+        .library(
             name: "ASCII Parser Primitives Standard Library Integration",
             targets: ["ASCII Parser Primitives Standard Library Integration"]
         ),
@@ -78,6 +86,20 @@ let package = Package(
                 .product(name: "Parser Primitives", package: "swift-parser-primitives"),
             ]
         ),
+        .target(
+            name: "ASCII Binary Parser Primitives",
+            dependencies: [
+                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
+                .product(name: "Parser Primitives", package: "swift-parser-primitives"),
+            ]
+        ),
+        .target(
+            name: "ASCII Octal Parser Primitives",
+            dependencies: [
+                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
+                .product(name: "Parser Primitives", package: "swift-parser-primitives"),
+            ]
+        ),
 
         // MARK: - Conformances
 
@@ -101,6 +123,8 @@ let package = Package(
                 "Parseable ASCII Primitives",
                 "ASCII Decimal Parser Primitives",
                 "ASCII Hexadecimal Parser Primitives",
+                "ASCII Binary Parser Primitives",
+                "ASCII Octal Parser Primitives",
                 "ASCII Parser Primitives Standard Library Integration",
             ]
         ),
@@ -118,6 +142,20 @@ let package = Package(
             name: "ASCII Hexadecimal Parser Primitives Tests",
             dependencies: [
                 "ASCII Hexadecimal Parser Primitives",
+                "ASCII Parser Primitives Test Support",
+            ]
+        ),
+        .testTarget(
+            name: "ASCII Binary Parser Primitives Tests",
+            dependencies: [
+                "ASCII Binary Parser Primitives",
+                "ASCII Parser Primitives Test Support",
+            ]
+        ),
+        .testTarget(
+            name: "ASCII Octal Parser Primitives Tests",
+            dependencies: [
+                "ASCII Octal Parser Primitives",
                 "ASCII Parser Primitives Test Support",
             ]
         ),
