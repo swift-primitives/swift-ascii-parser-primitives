@@ -52,6 +52,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swift-primitives/swift-ascii-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-binary-parser-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-byte-parser-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-parser-primitives.git", branch: "main"),
@@ -77,6 +78,11 @@ let package = Package(
             dependencies: [
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
                 .product(name: "Parser Primitives", package: "swift-parser-primitives"),
+                // Borrowed-world twin `ASCII.Decimal.Machine` (relocated from
+                // Binary.ASCII, W1) compiles to the Binary.Machine IR. The edge
+                // ascii-parser → binary-parser is downward (binary-parser does
+                // not depend on ascii-parser; no [MOD-032] cycle).
+                .product(name: "Binary Machine Primitives", package: "swift-binary-parser-primitives"),
             ]
         ),
         .target(
