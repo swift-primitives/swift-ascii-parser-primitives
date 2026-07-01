@@ -17,9 +17,11 @@ extension ASCII {
     /// canonical `Parseable` attachment protocol.
     ///
     /// Generic algorithms dispatching on ASCII-substrate parsing can
-    /// require `T: ASCII.Parseable`. The canonical parser instance is
-    /// supplied by the conformer as a static accessor, by convention
-    /// (no protocol requirement carries the associated-type slot).
+    /// require `T: ASCII.Parseable`. Conformers witness the requirement
+    /// with the uniform `init(ascii:)` — parsing ASCII-substrate bytes into
+    /// the conforming type — and surface their parse-failure type through
+    /// the `Failure` associated type. The canonical parser instance may
+    /// additionally be exposed as a static accessor, by convention.
     ///
     /// ## Symmetry with `ASCII.Serializable`
     ///
@@ -29,5 +31,15 @@ extension ASCII {
     /// lands (per Φ.1 of the ASCII codable unification plan), conformers
     /// expose serialization through `ASCII.Decimal.Serializer<T>` or
     /// peer leaves directly.
-    public protocol Parseable {}
+    public protocol Parseable {
+        /// The error thrown when parsing ASCII-substrate bytes fails.
+        associatedtype Failure: Swift.Error
+
+        /// Creates a value by parsing ASCII-substrate byte content.
+        ///
+        /// - Parameter bytes: The ASCII-substrate bytes to parse.
+        /// - Throws: `Failure` if the content does not parse.
+        init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Failure)
+        where Bytes.Element == Byte
+    }
 }

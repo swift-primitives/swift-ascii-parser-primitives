@@ -45,7 +45,7 @@ The standard-library integration target adds a one-call convenience on the integ
 ```swift
 import ASCII_Parser_Primitives_Standard_Library_Integration
 
-let count = try Int(ascii: Array("42".utf8))   // 42
+let count = try Int(ascii: "42".utf8.map(Byte.init))   // 42
 ```
 
 ---

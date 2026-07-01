@@ -63,22 +63,23 @@ extension UInt64: ASCII.Parseable {
     public static var parser: ASCII.Decimal.Parser<Byte.Input, UInt64> { .init() }
 }
 
-// MARK: - init(ascii:) convenience
+// MARK: - init(ascii:) requirement witness
 //
-// Mirrors the canonical `Parseable.init(ascii:)` extension at
-// `swift-parser-primitives/Sources/Parser Primitives Core/Parseable.swift:38–42`
-// but is constrained to `FixedWidthInteger & ASCII.Parseable` so it
-// can find the `ASCII.Decimal.Parser<...>` leaf without an
-// associated-type slot on ASCII.Parseable itself (per [FAM-001]).
+// Witnesses the `ASCII.Parseable.init(ascii:)` requirement for every
+// stdlib integer conformer above. Constrained to
+// `FixedWidthInteger & ASCII.Parseable`, this single generic init satisfies
+// the protocol requirement for all ten integer types (Int…UInt64) at once;
+// the `Failure` associated type infers as ``ASCII/Decimal/Error``.
 
 extension FixedWidthInteger where Self: ASCII.Parseable {
     /// Creates an integer by parsing ASCII decimal bytes.
     ///
-    /// - Parameter ascii: The ASCII decimal bytes to parse.
+    /// - Parameter bytes: The ASCII decimal bytes to parse.
     /// - Throws: ``ASCII/Decimal/Error`` if parsing fails (no digits, overflow).
     @inlinable
-    public init(ascii: Swift.Array<UInt8>) throws(ASCII.Decimal.Error) {
-        var input = Byte.Input(ascii)
+    public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(ASCII.Decimal.Error)
+    where Bytes.Element == Byte {
+        var input = Byte.Input(bytes)
         let leaf = ASCII.Decimal.Parser<Byte.Input, Self>()
         self = try leaf.parse(&input)
     }
