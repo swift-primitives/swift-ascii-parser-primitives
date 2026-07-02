@@ -93,7 +93,7 @@ Import the narrowest product you need — a single radix target for one parser, 
 ## Community
 
 <!-- BEGIN: discussion -->
-*Discussion thread will be created at first public flip.*
+*Discussion thread will be created at first public release.*
 <!-- END: discussion -->
 
 ## License
