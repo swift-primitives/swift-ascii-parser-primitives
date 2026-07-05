@@ -56,7 +56,7 @@ let package = Package(
         .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-byte-parser-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-parser-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-shared-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-ownership-shared-primitives.git", branch: "main"),
     ],
     targets: [
         // MARK: - Sub-namespace
@@ -117,7 +117,7 @@ let package = Package(
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
                 .product(name: "Byte Parser Primitives", package: "swift-byte-parser-primitives"),
-                .product(name: "Shared Primitive", package: "swift-shared-primitives"),
+                .product(name: "Ownership Shared Primitive", package: "swift-ownership-shared-primitives"),
             ]
         ),
 
