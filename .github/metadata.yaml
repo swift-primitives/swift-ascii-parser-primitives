@@ -1,6 +1,6 @@
 # .github/metadata.yaml
 # Triaged by AI-assisted bulk pass (2026-04-29).
-description: "ASCII parser types for Swift."
+description: "ASCII-to-integer and decimal-float parsing across four radices with Eisel-Lemire float decoding for Swift."
 topics:
   - primitives
   - ascii
