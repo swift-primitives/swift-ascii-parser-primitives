@@ -15,7 +15,7 @@ public import Collection_Primitives
 
 extension ASCII.Decimal.Float {
     /// A parser that consumes an ASCII decimal floating-point literal
-    /// (e.g. `"-3.14159e-7"`, `"0.0001"`, `"6.022e23"`) and produces a
+    /// (such as `"-3.14159e-7"`, `"0.0001"`, `"6.022e23"`) and produces a
     /// `Swift.Double` via the Eisel–Lemire algorithm.
     ///
     /// The grammar accepted is the standard JSON/IEEE number grammar:
@@ -350,6 +350,7 @@ extension ASCII.Decimal.Float {
     internal static let maxExponentFastPath: Int = 22
 
     /// Powers of 10 that are exactly representable as binary64.
+    ///
     /// `1e0` through `1e22` are exact; `1e23` and beyond are not.
     @usableFromInline
     internal static let exactPowersOfTen: [Double] = [
