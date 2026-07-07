@@ -47,9 +47,12 @@ extension ASCII.Octal {
 }
 
 extension ASCII.Octal.Parser: Parser.`Protocol` {
+    /// The value produced when parsing succeeds.
     public typealias Output = T
+    /// The error thrown when parsing fails.
     public typealias Failure = ASCII.Octal.Error
 
+    /// Parses an integer value from `input`, consuming the digits it reads.
     @inlinable
     public func parse(_ input: inout Input) throws(Failure) -> T {
         // Resolve the consumption bound from the policy.
@@ -97,7 +100,8 @@ extension ASCII.Octal.Parser: Parser.`Protocol` {
             // most-negative value (e.g. `Int8 "-200"`: 128 has no `Int8`).
             let (product, mulOverflow) = result.multipliedReportingOverflow(by: 8)
             guard !mulOverflow else { throw .overflow }
-            let combined = negative
+            let combined =
+                negative
                 ? product.subtractingReportingOverflow(digit)
                 : product.addingReportingOverflow(digit)
             guard !combined.overflow else { throw .overflow }
@@ -109,6 +113,7 @@ extension ASCII.Octal.Parser: Parser.`Protocol` {
         switch count {
         case .exactly(let n):
             guard consumed == n else { throw .insufficientDigits }
+
         case .greedy, .atMost:
             guard consumed > 0 else { throw .noDigits }
         }

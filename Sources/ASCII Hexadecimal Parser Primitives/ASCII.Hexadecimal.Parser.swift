@@ -47,9 +47,12 @@ extension ASCII.Hexadecimal {
 }
 
 extension ASCII.Hexadecimal.Parser: Parser.`Protocol` {
+    /// The value produced when parsing succeeds.
     public typealias Output = T
+    /// The error thrown when parsing fails.
     public typealias Failure = ASCII.Hexadecimal.Error
 
+    /// Parses an integer value from `input`, consuming the digits it reads.
     @inlinable
     public func parse(_ input: inout Input) throws(Failure) -> T {
         // Resolve the consumption bound from the policy.
@@ -95,7 +98,8 @@ extension ASCII.Hexadecimal.Parser: Parser.`Protocol` {
             // most-negative value.
             let (shifted, shiftOverflow) = result.multipliedReportingOverflow(by: 16)
             guard !shiftOverflow else { throw .overflow }
-            let combined = negative
+            let combined =
+                negative
                 ? shifted.subtractingReportingOverflow(digit)
                 : shifted.addingReportingOverflow(digit)
             guard !combined.overflow else { throw .overflow }
@@ -107,6 +111,7 @@ extension ASCII.Hexadecimal.Parser: Parser.`Protocol` {
         switch count {
         case .exactly(let n):
             guard consumed == n else { throw .insufficientDigits }
+
         case .greedy, .atMost:
             guard consumed > 0 else { throw .noDigits }
         }

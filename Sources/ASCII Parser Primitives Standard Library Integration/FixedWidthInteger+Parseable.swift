@@ -5,13 +5,13 @@
 //  ASCII.Parseable conformances for standard library integer types.
 //
 
-public import Array_Primitives
 public import ASCII_Decimal_Parser_Primitives
+public import Array_Primitives
 public import Buffer_Linear_Primitive
 public import Buffer_Linear_Primitives
 public import Byte_Parser_Primitives
-public import Parseable_ASCII_Primitives
 public import Ownership_Shared_Primitive
+public import Parseable_ASCII_Primitives
 
 // MARK: - Sibling-shape ASCII.Parseable conformances
 //
@@ -24,42 +24,52 @@ public import Ownership_Shared_Primitive
 // protocol requirement) or via `init(ascii:)` (provided below).
 
 extension Int: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, Int> { .init() }
 }
 
 extension UInt: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, UInt> { .init() }
 }
 
 extension Int8: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, Int8> { .init() }
 }
 
 extension Int16: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, Int16> { .init() }
 }
 
 extension Int32: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, Int32> { .init() }
 }
 
 extension Int64: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, Int64> { .init() }
 }
 
 extension UInt8: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, UInt8> { .init() }
 }
 
 extension UInt16: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, UInt16> { .init() }
 }
 
 extension UInt32: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, UInt32> { .init() }
 }
 
 extension UInt64: ASCII.Parseable {
+    /// A decimal ASCII parser for this integer type.
     public static var parser: ASCII.Decimal.Parser<Byte.Input, UInt64> { .init() }
 }
 

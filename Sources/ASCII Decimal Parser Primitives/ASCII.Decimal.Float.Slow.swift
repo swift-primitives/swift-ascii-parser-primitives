@@ -26,8 +26,10 @@ extension ASCII.Decimal.Float {
     /// number of >19-digit positions they cover.
     @inlinable
     internal static func slowPath<Input: Collection.`Protocol`>(
-        input: borrowing Input, start: Input.Index, end: Input.Index
-    ) throws(ASCII.Decimal.Float.Error) -> Double
+        input: borrowing Input,
+        start: Input.Index,
+        end: Input.Index
+    ) throws(Self.Error) -> Double
     where Input.Element == UInt8 {
         var bytes: [UInt8] = []
         var i = start

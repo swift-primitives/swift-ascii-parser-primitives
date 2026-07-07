@@ -62,12 +62,15 @@ extension ASCII.Decimal.Machine {
 
         return M.build { builder -> M.Expression<T> in
             // Parse a single ASCII digit, convert to numeric value
-            let digit = M.take1(in: &builder).tryMap({ byte throws(M.Fault) -> T in
-                guard byte >= 0x30 && byte <= 0x39 else {
-                    throw .predicateFailed(byte: byte)
-                }
-                return T(byte.underlying - 0x30)
-            }, in: &builder)
+            let digit = M.take1(in: &builder).tryMap(
+                { byte throws(M.Fault) -> T in
+                    guard byte >= 0x30 && byte <= 0x39 else {
+                        throw .predicateFailed(byte: byte)
+                    }
+                    return T(byte.underlying - 0x30)
+                },
+                in: &builder
+            )
 
             // Fold additional digits, tracking multiplier for final combination
             let moreDigits = M.fold(
@@ -83,9 +86,14 @@ extension ASCII.Decimal.Machine {
             )
 
             // Combine: first digit * multiplier + accumulated sum
-            return M.sequence(digit, moreDigits, combine: { first, state in
-                first &* state.multiplier &+ state.sum
-            }, in: &builder)
+            return M.sequence(
+                digit,
+                moreDigits,
+                combine: { first, state in
+                    first &* state.multiplier &+ state.sum
+                },
+                in: &builder
+            )
         }
     }
 }
@@ -116,19 +124,22 @@ extension ASCII.Decimal.Machine {
 
         return M.build { builder -> M.Expression<T> in
             // Parse optional sign: -1 for '-', +1 for '+' or no sign
-            let minusSign = M.byte(0x2D, in: &builder).map({ _ in T(-1) }, in: &builder) // '-'
+            let minusSign = M.byte(0x2D, in: &builder).map({ _ in T(-1) }, in: &builder)  // '-'
             let plusSign = M.byte(0x2B, in: &builder).map({ _ in T(1) }, in: &builder)  // '+'
             let noSign = M.pure(T(1), in: &builder)
 
             let sign = M.oneOf([minusSign, plusSign, noSign], in: &builder)
 
             // Parse a single ASCII digit, convert to numeric value
-            let digit = M.take1(in: &builder).tryMap({ byte throws(M.Fault) -> T in
-                guard byte >= 0x30 && byte <= 0x39 else {
-                    throw .predicateFailed(byte: byte)
-                }
-                return T(byte.underlying - 0x30)
-            }, in: &builder)
+            let digit = M.take1(in: &builder).tryMap(
+                { byte throws(M.Fault) -> T in
+                    guard byte >= 0x30 && byte <= 0x39 else {
+                        throw .predicateFailed(byte: byte)
+                    }
+                    return T(byte.underlying - 0x30)
+                },
+                in: &builder
+            )
 
             // Fold additional digits, tracking multiplier for final combination
             let moreDigits = M.fold(
@@ -144,9 +155,14 @@ extension ASCII.Decimal.Machine {
             )
 
             // Combine first digit with accumulated rest
-            let magnitude = M.sequence(digit, moreDigits, combine: { first, state in
-                first &* state.multiplier &+ state.sum
-            }, in: &builder)
+            let magnitude = M.sequence(
+                digit,
+                moreDigits,
+                combine: { first, state in
+                    first &* state.multiplier &+ state.sum
+                },
+                in: &builder
+            )
 
             // Apply sign
             return M.sequence(sign, magnitude, combine: { s, m in s &* m }, in: &builder)

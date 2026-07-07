@@ -10,8 +10,8 @@
 //   - Mushtak & Lemire, Fast Number Parsing Without Fallback.
 //
 
-public import Collection_Primitives
 public import Byte_Primitives
+public import Collection_Primitives
 
 extension ASCII.Decimal.Float {
     /// A parser that consumes an ASCII decimal floating-point literal
@@ -48,15 +48,19 @@ extension ASCII.Decimal.Float {
     /// ```
     public struct Parser<Input: Collection.Slice.`Protocol`>: Sendable
     where Input: Sendable, Input.Element == UInt8 {
+        /// Creates a floating-point ASCII parser.
         @inlinable
         public init() {}
     }
 }
 
 extension ASCII.Decimal.Float.Parser: Parser.`Protocol` {
+    /// The value produced when parsing succeeds.
     public typealias Output = Double
+    /// The error thrown when parsing fails.
     public typealias Failure = ASCII.Decimal.Float.Error
 
+    /// Parses a floating-point value from `input`, consuming the bytes it reads.
     @inlinable
     public func parse(_ input: inout Input) throws(Failure) -> Double {
         guard !input.isEmpty else { throw .empty }
@@ -66,15 +70,15 @@ extension ASCII.Decimal.Float.Parser: Parser.`Protocol` {
 
         // Sign
         let first = input[index]
-        if first == 0x2D {              // '-'
+        if first == 0x2D {  // '-'
             negative = true
             input.formIndex(after: &index)
-        } else if first == 0x2B {       // '+'
+        } else if first == 0x2B {  // '+'
             input.formIndex(after: &index)
         }
 
         var mantissa: UInt64 = 0
-        var nSignificantDigits = 0      // mantissa contributors only (≤ 19)
+        var nSignificantDigits = 0  // mantissa contributors only (≤ 19)
         var nTotalDigits = 0
         var nDigitsAfterPoint = 0
         var tooManyDigits = false
@@ -121,7 +125,7 @@ extension ASCII.Decimal.Float.Parser: Parser.`Protocol` {
         let beforeExp = index
         if index < input.endIndex {
             let b = input[index]
-            if b == 0x65 || b == 0x45 {     // 'e' / 'E'
+            if b == 0x65 || b == 0x45 {  // 'e' / 'E'
                 input.formIndex(after: &index)
                 var expNegative = false
                 if index < input.endIndex {
@@ -157,20 +161,28 @@ extension ASCII.Decimal.Float.Parser: Parser.`Protocol` {
         let q = explicitExp - nDigitsAfterPoint
 
         let value: Double
-        if !tooManyDigits, let fast = ASCII.Decimal.Float.clingerFastPath(
-            negative: negative, mantissa: mantissa, q: q
-        ) {
+        if !tooManyDigits,
+            let fast = ASCII.Decimal.Float.clingerFastPath(
+                negative: negative,
+                mantissa: mantissa,
+                q: q
+            )
+        {
             value = fast
         } else if !tooManyDigits {
             value = ASCII.Decimal.Float.eiselLemire(
-                negative: negative, mantissa: mantissa, q: q
+                negative: negative,
+                mantissa: mantissa,
+                q: q
             )
         } else {
             // Reconstruct the literal bytes for the slow path.
             value = try ASCII.Decimal.Float.slowPath(
-                input: input, start: input.startIndex, end: index
+                input: input,
+                start: input.startIndex,
+                end: index
             )
-            _ = nTotalDigits   // silence unused-warning; reserved for future big-int path
+            _ = nTotalDigits  // silence unused-warning; reserved for future big-int path
         }
 
         input = input[index...]
@@ -197,7 +209,7 @@ extension ASCII.Decimal.Float {
     @inlinable
     public static func parse(
         _ span: borrowing Swift.Span<Byte>
-    ) throws(ASCII.Decimal.Float.Error) -> Double {
+    ) throws(Self.Error) -> Double {
         guard !span.isEmpty else { throw .empty }
 
         var i = 0
@@ -210,10 +222,10 @@ extension ASCII.Decimal.Float {
         // intentionally does NOT forward arithmetic (Byte is a domain
         // marker, not an integer algebra element).
         let first = span[i]
-        if first == 0x2D {              // '-'
+        if first == 0x2D {  // '-'
             negative = true
             i &+= 1
-        } else if first == 0x2B {       // '+'
+        } else if first == 0x2B {  // '+'
             i &+= 1
         }
 
@@ -295,13 +307,19 @@ extension ASCII.Decimal.Float {
 
         let q = explicitExp - nDigitsAfterPoint
 
-        if !tooManyDigits, let fast = clingerFastPath(
-            negative: negative, mantissa: mantissa, q: q
-        ) {
+        if !tooManyDigits,
+            let fast = clingerFastPath(
+                negative: negative,
+                mantissa: mantissa,
+                q: q
+            )
+        {
             return fast
         } else if !tooManyDigits {
             return eiselLemire(
-                negative: negative, mantissa: mantissa, q: q
+                negative: negative,
+                mantissa: mantissa,
+                q: q
             )
         } else {
             // Slow path (>19-digit mantissa): reconstruct prefix bytes
@@ -329,14 +347,14 @@ extension ASCII.Decimal.Float {
     @usableFromInline
     internal static let minExponentFastPath: Int = -22
     @usableFromInline
-    internal static let maxExponentFastPath: Int =  22
+    internal static let maxExponentFastPath: Int = 22
 
     /// Powers of 10 that are exactly representable as binary64.
     /// `1e0` through `1e22` are exact; `1e23` and beyond are not.
     @usableFromInline
     internal static let exactPowersOfTen: [Double] = [
-        1e0,  1e1,  1e2,  1e3,  1e4,  1e5,  1e6,  1e7,
-        1e8,  1e9,  1e10, 1e11, 1e12, 1e13, 1e14, 1e15,
+        1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7,
+        1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14, 1e15,
         1e16, 1e17, 1e18, 1e19, 1e20, 1e21, 1e22,
     ]
 
@@ -347,7 +365,9 @@ extension ASCII.Decimal.Float {
     /// exponent out of `[−22, +22]`); the caller falls through to Eisel–Lemire.
     @inlinable
     internal static func clingerFastPath(
-        negative: Bool, mantissa: UInt64, q: Int
+        negative: Bool,
+        mantissa: UInt64,
+        q: Int
     ) -> Double? {
         guard mantissa <= maxMantissaFastPath else { return nil }
         guard q >= minExponentFastPath, q <= maxExponentFastPath else { return nil }
@@ -375,7 +395,7 @@ extension ASCII.Decimal.Float {
     @usableFromInline
     internal static let minExponentRoundToEven: Int = -4
     @usableFromInline
-    internal static let maxExponentRoundToEven: Int =  23
+    internal static let maxExponentRoundToEven: Int = 23
 
     /// Eisel–Lemire core: compute the correctly rounded binary64 for
     /// `(mantissa, q)` where `mantissa` fits in 19 decimal digits.
@@ -384,7 +404,9 @@ extension ASCII.Decimal.Float {
     /// always sufficient for this case; no big-integer fallback is needed.
     @inlinable
     internal static func eiselLemire(
-        negative: Bool, mantissa: UInt64, q: Int
+        negative: Bool,
+        mantissa: UInt64,
+        q: Int
     ) -> Double {
         var w = mantissa
 
@@ -414,7 +436,7 @@ extension ASCII.Decimal.Float {
         if (high & precisionMask) == precisionMask {
             let (h2, _) = w.multipliedFullWidth(by: factor.low)
             let newLow = low &+ h2
-            if h2 > newLow {        // carry into `high`
+            if h2 > newLow {  // carry into `high`
                 high &+= 1
             }
             low = newLow
@@ -447,10 +469,11 @@ extension ASCII.Decimal.Float {
         // Round-to-even correction when the bit dropped on rounding is the only
         // information available and we sit exactly between two binary64 values.
         if low <= 1,
-           q >= minExponentRoundToEven, q <= maxExponentRoundToEven,
-           (resultMantissa & 3) == 1 {
+            q >= minExponentRoundToEven, q <= maxExponentRoundToEven,
+            (resultMantissa & 3) == 1
+        {
             if (resultMantissa << shift) == high {
-                resultMantissa &= ~UInt64(1)    // clear bit 0: round-to-even
+                resultMantissa &= ~UInt64(1)  // clear bit 0: round-to-even
             }
         }
 
@@ -477,7 +500,9 @@ extension ASCII.Decimal.Float {
     /// Pack `(sign, mantissa, power2)` into IEEE 754 binary64 bits.
     @inlinable
     internal static func makeDouble(
-        negative: Bool, mantissa: UInt64, power2: Int
+        negative: Bool,
+        mantissa: UInt64,
+        power2: Int
     ) -> Double {
         let signBit: UInt64 = negative ? (1 &<< 63) : 0
         let expBits: UInt64 = (UInt64(bitPattern: Int64(power2)) & 0x7FF) &<< 52

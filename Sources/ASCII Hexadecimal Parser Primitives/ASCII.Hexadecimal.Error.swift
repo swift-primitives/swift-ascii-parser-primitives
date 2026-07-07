@@ -6,6 +6,7 @@
 //
 
 extension ASCII.Hexadecimal {
+    /// Errors thrown when parsing a hexadecimal ASCII integer.
     public enum Error: Swift.Error, Sendable, Equatable {
         /// No digit bytes found at current position.
         case noDigits

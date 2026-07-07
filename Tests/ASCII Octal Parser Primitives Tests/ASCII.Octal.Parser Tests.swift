@@ -10,7 +10,6 @@ import Testing
 // conformance is impossible — see `Byte.Input+Bytes.swift`).
 private typealias Cursor = Byte.Input
 
-
 // MARK: - Test Suite Structure
 
 @Suite("ASCII.Octal.Parser")

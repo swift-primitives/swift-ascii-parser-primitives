@@ -28,7 +28,6 @@ import Testing
 
 private typealias Cursor = Input_Primitives.Input.Slice<Parser.Test.Bytes>
 
-
 // MARK: - Test Suite
 
 @Suite("Declarative Parser Syntax — var body convention")
@@ -129,7 +128,7 @@ extension Network.Endpoint.Parser: Parser.`Protocol` {
             ASCII.Decimal.Parser<_, UInt16>()
         }
         .map { host, port in Network.Endpoint(host: host, port: port) }
-        .error.map { (either) -> Network.Endpoint.Error in
+        .error.map { either -> Network.Endpoint.Error in
             switch either {
             case .right: .invalidPort
             case .left(.left): .invalidHost
@@ -172,16 +171,20 @@ extension Geometry.Point.Parser: Parser.`Protocol` {
             ASCII.Decimal.Parser<_, UInt16>()
         }
         .map { x, y, z in Geometry.Point(x: x, y: y, z: z) }
-        .error.map { (either) -> Geometry.Point.Error in
+        .error.map { either -> Geometry.Point.Error in
             switch either {
             case .right:
                 return .invalidZ
+
             case .left(.right):
                 return .expectedComma
+
             case .left(.left(.right)):
                 return .invalidY
+
             case .left(.left(.left(.right))):
                 return .expectedComma
+
             case .left(.left(.left(.left))):
                 return .invalidX
             }
@@ -213,7 +216,7 @@ extension Measurement.Range.Parser: Parser.`Protocol` {
             ASCII.Decimal.Parser<_, UInt32>()
         }
         .map { lower, upper in Measurement.Range(lower: lower, upper: upper) }
-        .error.map { (either) -> Measurement.Range.Error in
+        .error.map { either -> Measurement.Range.Error in
             switch either {
             case .right: .invalidUpper
             case .left(.left): .invalidLower
@@ -266,7 +269,7 @@ extension Weighted.Endpoint.Parser: Parser.`Protocol` {
             ASCII.Decimal.Parser<_, UInt16>()
         }
         .map { endpoint, weight in Weighted.Endpoint(endpoint: endpoint, weight: weight) }
-        .error.map { (either) -> Weighted.Endpoint.Error in
+        .error.map { either -> Weighted.Endpoint.Error in
             switch either {
             case .right: .invalidWeight
             case .left(.left): .invalidEndpoint

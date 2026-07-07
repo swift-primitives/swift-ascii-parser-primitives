@@ -6,6 +6,7 @@
 //
 
 extension ASCII.Decimal.Float {
+    /// Errors thrown when parsing a floating-point ASCII value.
     public enum Error: Swift.Error, Sendable, Equatable {
         /// Input was empty at the start of `parse(_:)`.
         case empty

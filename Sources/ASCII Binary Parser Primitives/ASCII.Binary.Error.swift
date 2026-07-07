@@ -6,6 +6,7 @@
 //
 
 extension ASCII.Binary {
+    /// Errors thrown when parsing a binary ASCII integer.
     public enum Error: Swift.Error, Sendable, Equatable {
         /// No digit bytes found at current position.
         case noDigits

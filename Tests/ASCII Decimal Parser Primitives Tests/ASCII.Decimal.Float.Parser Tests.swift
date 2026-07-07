@@ -143,7 +143,7 @@ extension ASCIIDecimalFloatParserTests.`Edge Case` {
         var input = bytes("3.14abc")
         let v = try parser.parse(&input)
         #expect(v == 3.14)
-        #expect(input.first == 0x61)        // 'a'
+        #expect(input.first == 0x61)  // 'a'
     }
 
     @Test
@@ -153,7 +153,7 @@ extension ASCIIDecimalFloatParserTests.`Edge Case` {
         var input = bytes("1e")
         let v = try parser.parse(&input)
         #expect(v == 1.0)
-        #expect(input.first == 0x65)        // 'e' still in stream
+        #expect(input.first == 0x65)  // 'e' still in stream
     }
 
     @Test
@@ -188,7 +188,7 @@ extension ASCIIDecimalFloatParserTests.`Edge Case` {
     func `pi to many digits`() throws {
         let pi = 3.141592653589793
         #expect(try parse("3.141592653589793") == pi)
-        #expect(try parse("3.14159265358979323846") == pi)   // > 19 digits → slow path
+        #expect(try parse("3.14159265358979323846") == pi)  // > 19 digits → slow path
     }
 
     @Test
@@ -223,7 +223,7 @@ extension ASCIIDecimalFloatParserTests.Integration {
         var input = bytes("42.5 next")
         let v = try parser.parse(&input)
         #expect(v == 42.5)
-        #expect(input.first == 0x20)        // space remains
+        #expect(input.first == 0x20)  // space remains
     }
 
     @Test
@@ -232,7 +232,7 @@ extension ASCIIDecimalFloatParserTests.Integration {
         var input = bytes("1.5,2.5")
         let v = try parser.parse(&input)
         #expect(v == 1.5)
-        #expect(input.first == 0x2C)        // ','
+        #expect(input.first == 0x2C)  // ','
     }
 
     @Test
@@ -241,8 +241,8 @@ extension ASCIIDecimalFloatParserTests.Integration {
             "0", "0.0", "1", "1.0", "-1", "1e10", "1e-10",
             "3.14", "2.718281828", "-273.15",
             "6.022e23", "1.602176634e-19",
-            "1.7976931348623157e308",      // approx Double.greatestFiniteMagnitude
-            "2.2250738585072014e-308",     // approx Double.leastNormalMagnitude
+            "1.7976931348623157e308",  // approx Double.greatestFiniteMagnitude
+            "2.2250738585072014e-308",  // approx Double.leastNormalMagnitude
             "0.1", "0.2", "0.3",
         ]
         for s in cases {
@@ -258,7 +258,7 @@ extension ASCIIDecimalFloatParserTests.Integration {
         let cases: [String] = [
             "1e23", "1e24", "1e50", "1e100", "1e-50",
             "1.234567890123456789e25",
-            "9.999999999999999e307",       // near overflow
+            "9.999999999999999e307",  // near overflow
             "1.5e-200", "1.5e200",
         ]
         for s in cases {
@@ -273,11 +273,11 @@ extension ASCIIDecimalFloatParserTests.Integration {
         // Halfway-rounding cases where round-to-even matters.
         let cases: [String] = [
             "1.0", "2.0", "0.5",
-            "1.7976931348623157e308",      // largest finite Double
-            "5e-324",                       // smallest subnormal
+            "1.7976931348623157e308",  // largest finite Double
+            "5e-324",  // smallest subnormal
             // "Famously tricky" parses (from the Lemire test corpus):
             "7.3177701707893310e+15",
-            "2.2250738585072011e-308",     // boundary between subnormal and normal
+            "2.2250738585072011e-308",  // boundary between subnormal and normal
         ]
         for s in cases {
             let mine = try parse(s)
