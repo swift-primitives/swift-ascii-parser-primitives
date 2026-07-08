@@ -365,7 +365,7 @@ extension ASCII.Decimal.Float {
     /// Returns `nil` when preconditions aren't met (mantissa too large or
     /// exponent out of `[−22, +22]`); the caller falls through to Eisel–Lemire.
     @inlinable
-    internal static func clingerFastPath(
+    package static func clingerFastPath(
         negative: Bool,
         mantissa: UInt64,
         q: Int
@@ -404,7 +404,7 @@ extension ASCII.Decimal.Float {
     /// Mushtak–Lemire (2024) proves the 128-bit product approximation is
     /// always sufficient for this case; no big-integer fallback is needed.
     @inlinable
-    internal static func eiselLemire(
+    package static func eiselLemire(
         negative: Bool,
         mantissa: UInt64,
         q: Int
@@ -500,7 +500,7 @@ extension ASCII.Decimal.Float {
 
     /// Pack `(sign, mantissa, power2)` into IEEE 754 binary64 bits.
     @inlinable
-    internal static func makeDouble(
+    package static func makeDouble(
         negative: Bool,
         mantissa: UInt64,
         power2: Int

@@ -25,7 +25,7 @@ extension ASCII.Decimal.Float {
     /// practice because such inputs are rare and short relative to the
     /// number of >19-digit positions they cover.
     @inlinable
-    internal static func slowPath<Input: Collection.`Protocol`>(
+    package static func slowPath<Input: Collection.`Protocol`>(
         input: borrowing Input,
         start: Input.Index,
         end: Input.Index

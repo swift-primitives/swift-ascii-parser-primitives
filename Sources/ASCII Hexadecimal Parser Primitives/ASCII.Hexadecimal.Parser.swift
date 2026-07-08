@@ -121,7 +121,7 @@ extension ASCII.Hexadecimal.Parser: Parser.`Protocol` {
     }
 
     @inlinable
-    static func _hexValue(_ byte: Byte) -> T? {
+    package static func _hexValue(_ byte: Byte) -> T? {
         let raw = byte.underlying
         switch raw {
         case 0x30...0x39: return T(raw &- 0x30)

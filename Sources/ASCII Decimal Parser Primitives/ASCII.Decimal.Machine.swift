@@ -30,7 +30,7 @@ extension ASCII.Decimal.Machine {
         @usableFromInline var sum: T
 
         @inlinable
-        init(multiplier: T, sum: T) {
+        package init(multiplier: T, sum: T) {
             self.multiplier = multiplier
             self.sum = sum
         }
