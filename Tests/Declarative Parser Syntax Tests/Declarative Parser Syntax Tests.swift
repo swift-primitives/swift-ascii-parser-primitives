@@ -44,7 +44,9 @@ struct DeclarativeParserSyntaxTests {
 
 // MARK: - Network.Endpoint
 
-struct Network: Sendable {
+struct Network: Sendable {}
+
+extension Network {
     struct Endpoint: Equatable, Sendable {
         let host: UInt16
         let port: UInt16
@@ -61,7 +63,9 @@ extension Network.Endpoint {
 
 // MARK: - Geometry.Point
 
-struct Geometry: Sendable {
+struct Geometry: Sendable {}
+
+extension Geometry {
     struct Point: Equatable, Sendable {
         let x: UInt16
         let y: UInt16
@@ -80,7 +84,9 @@ extension Geometry.Point {
 
 // MARK: - Measurement.Range
 
-struct Measurement: Sendable {
+struct Measurement: Sendable {}
+
+extension Measurement {
     struct Range: Equatable, Sendable {
         let lower: UInt32
         let upper: UInt32
@@ -236,7 +242,9 @@ extension Measurement.Range.Parser: Parser.`Protocol` {
 //
 // Demonstrates that declarative parsers compose seamlessly.
 
-struct Weighted: Sendable {
+struct Weighted: Sendable {}
+
+extension Weighted {
     struct Endpoint: Equatable, Sendable {
         let endpoint: Network.Endpoint
         let weight: UInt16
