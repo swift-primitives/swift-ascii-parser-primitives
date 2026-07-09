@@ -12,8 +12,8 @@ private typealias Cursor = Byte.Input
 
 // MARK: - Test Suite Structure
 
-@Suite("ASCII.Hexadecimal.Parser")
-struct ASCIIHexadecimalParserTests {
+@Suite
+struct `ASCII.Hexadecimal.Parser Tests` {
     @Suite struct Unit {}
     @Suite struct EdgeCase {}
     @Suite struct CountPolicy {}
@@ -22,7 +22,7 @@ struct ASCIIHexadecimalParserTests {
 
 // MARK: - Unit Tests
 
-extension ASCIIHexadecimalParserTests.Unit {
+extension `ASCII.Hexadecimal.Parser Tests`.Unit {
     @Test
     func `parses lowercase hex`() throws {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>()
@@ -77,7 +77,7 @@ extension ASCIIHexadecimalParserTests.Unit {
 
 // MARK: - Edge Case Tests
 
-extension ASCIIHexadecimalParserTests.EdgeCase {
+extension `ASCII.Hexadecimal.Parser Tests`.EdgeCase {
     @Test
     func `fails on empty input`() {
         let parser = ASCII.Hexadecimal.Parser<Cursor, Int>()
@@ -121,7 +121,7 @@ extension ASCIIHexadecimalParserTests.EdgeCase {
 
 // MARK: - Count Policy Tests
 
-extension ASCIIHexadecimalParserTests.CountPolicy {
+extension `ASCII.Hexadecimal.Parser Tests`.CountPolicy {
     @Test
     func `greedy default consumes all digits`() throws {
         let parser = ASCII.Hexadecimal.Parser<Cursor, UInt32>(count: .greedy)
@@ -230,7 +230,7 @@ extension ASCIIHexadecimalParserTests.CountPolicy {
 
 // MARK: - Sign Policy Tests
 
-extension ASCIIHexadecimalParserTests.SignPolicy {
+extension `ASCII.Hexadecimal.Parser Tests`.SignPolicy {
     @Test
     func `none default leaves a leading plus unconsumed`() {
         let parser = ASCII.Hexadecimal.Parser<Cursor, Int>()  // sign: .none

@@ -12,8 +12,8 @@ private typealias Cursor = Byte.Input
 
 // MARK: - Test Suite Structure
 
-@Suite("ASCII.Octal.Parser")
-struct ASCIIOctalParserTests {
+@Suite
+struct `ASCII.Octal.Parser Tests` {
     @Suite struct Unit {}
     @Suite struct EdgeCase {}
     @Suite struct CountPolicy {}
@@ -22,7 +22,7 @@ struct ASCIIOctalParserTests {
 
 // MARK: - Unit Tests
 
-extension ASCIIOctalParserTests.Unit {
+extension `ASCII.Octal.Parser Tests`.Unit {
     @Test
     func `parses single digit`() throws {
         let parser = ASCII.Octal.Parser<Cursor, Int>()
@@ -90,7 +90,7 @@ extension ASCIIOctalParserTests.Unit {
 
 // MARK: - Edge Case Tests
 
-extension ASCIIOctalParserTests.EdgeCase {
+extension `ASCII.Octal.Parser Tests`.EdgeCase {
     @Test
     func `fails on empty input`() {
         let parser = ASCII.Octal.Parser<Cursor, Int>()
@@ -134,7 +134,7 @@ extension ASCIIOctalParserTests.EdgeCase {
 
 // MARK: - Count Policy Tests
 
-extension ASCIIOctalParserTests.CountPolicy {
+extension `ASCII.Octal.Parser Tests`.CountPolicy {
     @Test
     func `greedy default consumes all digits`() throws {
         let parser = ASCII.Octal.Parser<Cursor, Int>(count: .greedy)
@@ -254,7 +254,7 @@ extension ASCIIOctalParserTests.CountPolicy {
 
 // MARK: - Sign Policy Tests
 
-extension ASCIIOctalParserTests.SignPolicy {
+extension `ASCII.Octal.Parser Tests`.SignPolicy {
     @Test
     func `none default leaves a leading plus unconsumed`() {
         let parser = ASCII.Octal.Parser<Cursor, Int>()  // sign: .none

@@ -12,8 +12,8 @@ private typealias Cursor = Byte.Input
 
 // MARK: - Test Suite Structure
 
-@Suite("ASCII.Decimal.Parser")
-struct ASCIIDecimalParserTests {
+@Suite
+struct `ASCII.Decimal.Parser Tests` {
     @Suite struct Unit {}
     @Suite struct EdgeCase {}
     @Suite struct CountPolicy {}
@@ -22,7 +22,7 @@ struct ASCIIDecimalParserTests {
 
 // MARK: - Unit Tests
 
-extension ASCIIDecimalParserTests.Unit {
+extension `ASCII.Decimal.Parser Tests`.Unit {
     @Test
     func `parses single digit`() throws {
         let parser = ASCII.Decimal.Parser<Cursor, Int>()
@@ -90,7 +90,7 @@ extension ASCIIDecimalParserTests.Unit {
 
 // MARK: - Edge Case Tests
 
-extension ASCIIDecimalParserTests.EdgeCase {
+extension `ASCII.Decimal.Parser Tests`.EdgeCase {
     @Test
     func `fails on empty input`() {
         let parser = ASCII.Decimal.Parser<Cursor, Int>()
@@ -134,7 +134,7 @@ extension ASCIIDecimalParserTests.EdgeCase {
 
 // MARK: - Count Policy Tests
 
-extension ASCIIDecimalParserTests.CountPolicy {
+extension `ASCII.Decimal.Parser Tests`.CountPolicy {
     @Test
     func `greedy default consumes all digits`() throws {
         let parser = ASCII.Decimal.Parser<Cursor, Int>(count: .greedy)
@@ -254,7 +254,7 @@ extension ASCIIDecimalParserTests.CountPolicy {
 
 // MARK: - Sign Policy Tests
 
-extension ASCIIDecimalParserTests.SignPolicy {
+extension `ASCII.Decimal.Parser Tests`.SignPolicy {
     @Test
     func `none default leaves a leading plus unconsumed`() {
         let parser = ASCII.Decimal.Parser<Cursor, Int>()  // sign: .none

@@ -12,8 +12,8 @@ private typealias Cursor = Byte.Input
 
 // MARK: - Test Suite Structure
 
-@Suite("ASCII.Binary.Parser")
-struct ASCIIBinaryParserTests {
+@Suite
+struct `ASCII.Binary.Parser Tests` {
     @Suite struct Unit {}
     @Suite struct EdgeCase {}
     @Suite struct CountPolicy {}
@@ -22,7 +22,7 @@ struct ASCIIBinaryParserTests {
 
 // MARK: - Unit Tests
 
-extension ASCIIBinaryParserTests.Unit {
+extension `ASCII.Binary.Parser Tests`.Unit {
     @Test
     func `parses single digit`() throws {
         let parser = ASCII.Binary.Parser<Cursor, Int>()
@@ -90,7 +90,7 @@ extension ASCIIBinaryParserTests.Unit {
 
 // MARK: - Edge Case Tests
 
-extension ASCIIBinaryParserTests.EdgeCase {
+extension `ASCII.Binary.Parser Tests`.EdgeCase {
     @Test
     func `fails on empty input`() {
         let parser = ASCII.Binary.Parser<Cursor, Int>()
@@ -134,7 +134,7 @@ extension ASCIIBinaryParserTests.EdgeCase {
 
 // MARK: - Count Policy Tests
 
-extension ASCIIBinaryParserTests.CountPolicy {
+extension `ASCII.Binary.Parser Tests`.CountPolicy {
     @Test
     func `greedy default consumes all digits`() throws {
         let parser = ASCII.Binary.Parser<Cursor, Int>(count: .greedy)
@@ -254,7 +254,7 @@ extension ASCIIBinaryParserTests.CountPolicy {
 
 // MARK: - Sign Policy Tests
 
-extension ASCIIBinaryParserTests.SignPolicy {
+extension `ASCII.Binary.Parser Tests`.SignPolicy {
     @Test
     func `none default leaves a leading plus unconsumed`() {
         let parser = ASCII.Binary.Parser<Cursor, Int>()  // sign: .none

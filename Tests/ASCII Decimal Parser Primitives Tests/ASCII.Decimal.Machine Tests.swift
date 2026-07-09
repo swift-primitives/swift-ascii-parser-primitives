@@ -8,15 +8,17 @@ import Testing
 // full execution is covered by the Binary.Machine borrowed-input harness in
 // swift-binary-parser-primitives.
 
-@Suite("ASCII.Decimal.Machine")
-struct ASCIIDecimalMachineTests {
-    @Test
-    func `builds an unsigned decimal parser`() {
-        let _: Binary.Machine.Parser<UInt32> = ASCII.Decimal.Machine.unsigned()
-    }
+extension ASCII.Decimal.Machine {
+    @Suite
+    struct Test {
+        @Test
+        func `builds an unsigned decimal parser`() {
+            let _: Binary.Machine.Parser<UInt32> = ASCII.Decimal.Machine.unsigned()
+        }
 
-    @Test
-    func `builds a signed decimal parser`() {
-        let _: Binary.Machine.Parser<Int32> = ASCII.Decimal.Machine.signed()
+        @Test
+        func `builds a signed decimal parser`() {
+            let _: Binary.Machine.Parser<Int32> = ASCII.Decimal.Machine.signed()
+        }
     }
 }

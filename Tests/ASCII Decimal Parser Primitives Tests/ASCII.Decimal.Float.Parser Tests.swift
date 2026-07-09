@@ -7,8 +7,8 @@ private typealias Cursor = Input_Primitives.Input.Slice<Parser.Test.Bytes>
 
 // MARK: - Test Suite Structure
 
-@Suite("ASCII.Decimal.Float.Parser")
-struct ASCIIDecimalFloatParserTests {
+@Suite
+struct `ASCII.Decimal.Float.Parser Tests` {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
     @Suite struct Integration {}
@@ -29,7 +29,7 @@ private func parse(_ s: String) throws -> Double {
 
 // MARK: - Unit Tests
 
-extension ASCIIDecimalFloatParserTests.Unit {
+extension `ASCII.Decimal.Float.Parser Tests`.Unit {
 
     @Test
     func `integer literal`() throws {
@@ -117,7 +117,7 @@ extension ASCIIDecimalFloatParserTests.Unit {
 
 // MARK: - Edge Cases
 
-extension ASCIIDecimalFloatParserTests.`Edge Case` {
+extension `ASCII.Decimal.Float.Parser Tests`.`Edge Case` {
 
     @Test
     func `empty input`() throws {
@@ -215,7 +215,7 @@ extension ASCIIDecimalFloatParserTests.`Edge Case` {
 
 // MARK: - Integration Tests
 
-extension ASCIIDecimalFloatParserTests.Integration {
+extension `ASCII.Decimal.Float.Parser Tests`.Integration {
 
     @Test
     func `parses then stops on whitespace`() throws {
