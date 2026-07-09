@@ -15,9 +15,9 @@ private typealias Cursor = Byte.Input
 @Suite
 struct `ASCII.Decimal.Parser Tests` {
     @Suite struct Unit {}
-    @Suite struct EdgeCase {}
-    @Suite struct CountPolicy {}
-    @Suite struct SignPolicy {}
+    @Suite struct `Edge Case` {}
+    @Suite struct `Count Policy` {}
+    @Suite struct `Sign Policy` {}
 }
 
 // MARK: - Unit Tests
@@ -90,7 +90,7 @@ extension `ASCII.Decimal.Parser Tests`.Unit {
 
 // MARK: - Edge Case Tests
 
-extension `ASCII.Decimal.Parser Tests`.EdgeCase {
+extension `ASCII.Decimal.Parser Tests`.`Edge Case` {
     @Test
     func `fails on empty input`() {
         let parser = ASCII.Decimal.Parser<Cursor, Int>()
@@ -134,7 +134,7 @@ extension `ASCII.Decimal.Parser Tests`.EdgeCase {
 
 // MARK: - Count Policy Tests
 
-extension `ASCII.Decimal.Parser Tests`.CountPolicy {
+extension `ASCII.Decimal.Parser Tests`.`Count Policy` {
     @Test
     func `greedy default consumes all digits`() throws {
         let parser = ASCII.Decimal.Parser<Cursor, Int>(count: .greedy)
@@ -254,7 +254,7 @@ extension `ASCII.Decimal.Parser Tests`.CountPolicy {
 
 // MARK: - Sign Policy Tests
 
-extension `ASCII.Decimal.Parser Tests`.SignPolicy {
+extension `ASCII.Decimal.Parser Tests`.`Sign Policy` {
     @Test
     func `none default leaves a leading plus unconsumed`() {
         let parser = ASCII.Decimal.Parser<Cursor, Int>()  // sign: .none
